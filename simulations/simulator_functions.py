@@ -1,4 +1,4 @@
-import re, os, inspect, sys
+import re, os, inspect, sys, glob
 import numpy as np
 
 def headless(inputfile):
@@ -120,3 +120,41 @@ def write_hpc_headers(step,params):
 	with open('job_%s.%s'%(step,hpc_job), 'w') as filehandle:
 		for listitem in hpc_header:
 			filehandle.write('%s\n' % listitem)
+
+def rmfiles(files):
+	func_name = inspect.stack()[0][3]
+	for i in files:
+		if "*" in i:
+			files_to_die = glob.glob(i)
+			print('Files matching with %s - deleting'% i)
+			for j in files_to_die:
+				if os.path.exists(j) == True:
+					print('File %s found - deleting'% j)
+					os.system('rm %s'%j)
+				else:
+					pass
+		elif os.path.exists(i) == True:
+			print('File %s found - deleting'% i)
+			os.system('rm %s'%i)
+		else:
+			print('No file found - %s'% i)
+	return
+
+def rmdirs(dirs):
+	func_name = inspect.stack()[0][3]
+	for i in dirs:
+		if "*" in i:
+			files_to_die = glob.glob(i)
+			print('Directories matching with %s - deleting'% i)
+			for j in files_to_die:
+				if os.path.exists(j) == True:
+					print('Directory/table %s found - deleting'% j)
+					os.system('rm -r %s'%j)
+				else:
+					pass
+		elif os.path.exists(i) == True:
+			print('Directory/table %s found - deleting'% i)
+			os.system('rm -r %s'%i)
+		else:
+			print('No file found - %s'% i)
+	return
