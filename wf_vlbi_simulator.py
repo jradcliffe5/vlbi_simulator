@@ -56,7 +56,7 @@ if part == 1:
 	commands.append('%s %s/add_noise_hetero.py %s %s'%(inputs['CASA_exec'],rpath, sys.argv[i], sys.argv[i+1]))
 
 	## Generate a terms
-	commands.append('%s %s/generate_pb_aterms.py 0 0 0 %s'%(inputs['CASA_exec'], rpath, sys.argv[i], sys.argv[i+1]))
+	commands.append('%s %s/generate_pb_aterms.py 0 0 0 %s %s'%(inputs['CASA_exec'], rpath, sys.argv[i], sys.argv[i+1]))
 
 	## Unzip a terms
 	commands.append('gunzip -f %s/single_pointing.ms_pb_flat_norotate.fits.gz'%(inputs['output_path']))
