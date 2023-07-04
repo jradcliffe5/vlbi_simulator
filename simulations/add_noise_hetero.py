@@ -11,7 +11,7 @@ from astropy.io import fits
 from astropy.nddata.utils import Cutout2D
 from astropy.wcs import WCS
 from astropy import units as u
-from skimage.transform import resize, rotate, rescale
+from skimage.transform import rotate, rescale
 from simulator_functions import *
 casa6=True
 
@@ -87,10 +87,6 @@ def check_elevation(msfile,custom_xyz=False):
 	tb = casatools.table()
 	qa = casatools.quanta()
 	me = casatools.measures()
-	#measure = pm.measures()
-	#tab = pt.table(msfile, readonly=True,ack=False)
-	#field_tab = pt.table(tab.getkeyword('FIELD'),ack=False)
-	#direction = np.squeeze(field_tab.getcol('PHASE_DIR'))
 	
 	tb.open(msfile, nomodify=True)
 	time_unique = np.unique(tb.getcol('TIME'))
@@ -450,8 +446,6 @@ def rescale_synthetic_HPBW(header,c_freq,diameter,vmodel,a_term_upscale,phase_ce
 
 def add_pt_src(msfile,pt_flux):
 	tb = casatools.table()
-	qa = casatools.quanta()
-	me = casatools.measures()
 	cl = casatools.componentlist()
 	tb.open(msfile+'/SOURCE')
 	direc = tb.getcol('DIRECTION')
@@ -558,7 +552,6 @@ print('Match antennae to sefds')
 sefd_ants, diams_ants = match_to_antenna_nos(evn_SEFD[band],ms)
 print('Add simple noise')
 add_noise(msfile=ms,datacolumn='CORRECTED_DATA',evn_SEFD=sefd_ants,adjust_time=adjust_time)
-print('Flag e-MERLIN short baseline Lo-Mk2')
 
 
 print('Make image')
