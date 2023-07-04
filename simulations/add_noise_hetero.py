@@ -521,12 +521,28 @@ evn_SEFD = {'L':{
 				'Ys':[160,25]}
 			}
 
-ms = sys.argv[1]
-imsize = int(sys.argv[2])
-adjust_time = float(sys.argv[3])
-band=str(sys.argv[4])
 
-cell = str(sys.argv[5])
+
+obs_freq = float(inputs['obs_freq'])
+
+if (obs_freq > 1.0) & (obs_freq < 2.0):
+	band='L'
+elif (obs_freq > 2.0) & (obs_freq < 3.5):
+	band='S'
+elif (obs_freq > 3.5) & (obs_freq < 7.5):
+	band='C'
+elif (obs_freq > 7.5):
+	band='K'
+else:
+	print('band not supported')
+	sys.exit()
+
+
+#ms = sys.argv[1]
+#imsize = int(sys.argv[2])
+#adjust_time = float(sys.argv[3])
+#band=str(sys.argv[4])
+#cell = str(sys.argv[5])
 print('Clearing cal')
 clearcal(vis=ms)
 print('Write flag')

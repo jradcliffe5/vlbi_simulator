@@ -19,7 +19,10 @@ except:
 
 ## Load global inputs
 inputs = headless(sys.argv[i])
-part = int(sys.argv[i+1])
+adv_inputs = headless(sys.argv[i+1])
+part = int(sys.argv[i+2])
+
+rpath=inputs['repo_path']
 
 ## Set the parameters for the HPC resources
 params = {}
@@ -36,42 +39,24 @@ params['output_path'] = inputs['output_path']
 params['mem'] = inputs['mem']
 params['max_jobs'] = int(inputs['max_jobs'])
 
-## Set the parameters for software
-print(inputs['CASA_exec'])
-
-obs_freq = float(inputs['obs_freq'])
-
-if (obs_freq > 1.0) & (obs_freq < 2.0):
-	band='L'
-elif (obs_freq > 2.0) & (obs_freq < 3.5):
-	band='S'
-elif (obs_freq > 3.5) & (obs_freq < 7.5):
-	band='C'
-elif (obs_freq > 7.5):
-	band='K'
-else:
-	print('band not supported')
-	sys.exit()
-
 ## Generate single pointing to fit beam
 if part == 1:
 	commands = []
 	step = 'single_pointing'
 	write_hpc_headers(step,params)
-	#commands.append('module purge singularity')
 
 	## Generate itrfs
 	antennae = ast.literal_eval(inputs['antennae'])
-	commands.append('%s simulations/make_itrf.py %s'%(inputs['CASA_exec']," ".join(antennae)))
+	commands.append('%s %s/make_itrf.py %s'%(inputs['CASA_exec'], rpath, " ".join(antennae)))
 
 	## Generate measurement set
-	commands.append('%s simulations/make_measurement_set.py single simulator_inputs.txt'%(inputs['stimela_exec']))
+	commands.append('%s %s/make_measurement_set.py single %s %s'%(inputs['stimela_exec'],rpath, sys.argv[i], sys.argv[i+1]))
 
 	## Add noise to measurement sets & flag
-	commands.append('%s simulations/add_noise_hetero.py %s/single_pointing.ms %d %.3f %s %s'%(inputs['CASA_exec'],inputs['output_path'],int(inputs['size']),float(inputs['time_multiplier']),band,inputs['cell']))
+	commands.append('%s %s/add_noise_hetero.py %s %s'%(inputs['CASA_exec'],rpath, sys.argv[i], sys.argv[i+1]))
 
 	## Generate a terms
-	commands.append('%s simulations/generate_pb_aterms.py %s/single_pointing.ms 0 0 0 %s'%(inputs['CASA_exec'],inputs['output_path'],band))
+	commands.append('%s %s/generate_pb_aterms.py 0 0 0 %s'%(inputs['CASA_exec'], rpath, sys.argv[i], sys.argv[i+1]))
 
 	## Unzip a terms
 	commands.append('gunzip -f %s/single_pointing.ms_pb_flat_norotate.fits.gz'%(inputs['output_path']))
