@@ -47,16 +47,16 @@ if part == 1:
 
 	## Generate itrfs
 	antennae = ast.literal_eval(inputs['antennae'])
-	commands.append('%s %s/make_itrf.py %s'%(inputs['CASA_exec'], rpath, " ".join(antennae)))
+	commands.append('%s %s/simulations/make_itrf.py %s'%(inputs['CASA_exec'], rpath, " ".join(antennae)))
 
 	## Generate measurement set
-	commands.append('%s %s/make_measurement_set.py single %s %s'%(inputs['stimela_exec'],rpath, sys.argv[i], sys.argv[i+1]))
+	commands.append('%s %s/simulations/make_measurement_set.py single %s %s'%(inputs['stimela_exec'],rpath, sys.argv[i], sys.argv[i+1]))
 
 	## Add noise to measurement sets & flag
-	commands.append('%s %s/add_noise_hetero.py %s %s'%(inputs['CASA_exec'],rpath, sys.argv[i], sys.argv[i+1]))
+	commands.append('%s %s/simulations/add_noise_hetero.py %s %s'%(inputs['CASA_exec'],rpath, sys.argv[i], sys.argv[i+1]))
 
 	## Generate a terms
-	commands.append('%s %s/generate_pb_aterms.py 0 0 0 %s %s'%(inputs['CASA_exec'], rpath, sys.argv[i], sys.argv[i+1]))
+	commands.append('%s %s/simulations/generate_pb_aterms.py 0 0 0 %s %s'%(inputs['CASA_exec'], rpath, sys.argv[i], sys.argv[i+1]))
 
 	## Unzip a terms
 	commands.append('gunzip -f %s/single_pointing.ms_pb_flat_norotate.fits.gz'%(inputs['output_path']))

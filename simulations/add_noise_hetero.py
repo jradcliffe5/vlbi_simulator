@@ -1,4 +1,4 @@
-import os,sys
+import os,sys,re
 from collections import OrderedDict
 import numpy as np
 from scipy import constants as c
@@ -12,6 +12,7 @@ from astropy.nddata.utils import Cutout2D
 from astropy.wcs import WCS
 from astropy import units as u
 from skimage.transform import resize, rotate, rescale
+from simulator_functions import *
 casa6=True
 
 from astropy.utils.exceptions import AstropyWarning
@@ -521,10 +522,17 @@ evn_SEFD = {'L':{
 				'Ys':[160,25]}
 			}
 
+## Imports input_file
+try:
+	i = sys.argv.index("-c") + 2
+except:
+	i = 1
+	pass
 
+inputs = headless(sys.argv[i])
+adv_inputs = headless(sys.argv[i+1])
 
 obs_freq = float(inputs['obs_freq'])
-
 if (obs_freq > 1.0) & (obs_freq < 2.0):
 	band='L'
 elif (obs_freq > 2.0) & (obs_freq < 3.5):
@@ -538,23 +546,23 @@ else:
 	sys.exit()
 
 
-#ms = sys.argv[1]
-#imsize = int(sys.argv[2])
-#adjust_time = float(sys.argv[3])
-#band=str(sys.argv[4])
-#cell = str(sys.argv[5])
-print('Clearing cal')
+ms = '%s/%s_single_pointing.ms'%(inputs['output_path'],inputs['prefix'])
+imsize = int(inputs['size'])
+cell = str(inputs['cell'])
+adjust_time = float(inputs['time_multiplier'])
+print('Clearing calibration')
 clearcal(vis=ms)
-print('Write flag')
+print('Write elevation dependent flags')
 write_flag(ms,0,check_elevation(ms,custom_xyz=True),make_baseline_dictionary(ms))
-print('Match antennae')
+print('Match antennae to sefds')
 sefd_ants, diams_ants = match_to_antenna_nos(evn_SEFD[band],ms)
-print('Add noise')
+print('Add simple noise')
 add_noise(msfile=ms,datacolumn='CORRECTED_DATA',evn_SEFD=sefd_ants,adjust_time=adjust_time)
-print('Flag e-MERLIN')
+print('Flag e-MERLIN short baseline Lo-Mk2')
 
 
-os.system('rm -r %s_IM.*'%ms.split('.ms')[0])
+print('Make image')
+rmdirs(glob.glob('%s_IM.*'%ms.split('.ms')[0]))
 tclean(vis=ms,
 	   imagename='%s_IM'%ms.split('.ms')[0],
 	   cell=cell,
@@ -563,5 +571,5 @@ tclean(vis=ms,
 	   niter=int(1e5),
 	   nsigma=1.2,
 	   usemask='user',
-           pblimit=1e-10,
+       pblimit=1e-10,
 	   mask='circle[[%dpix, %dpix], 5pix]'%(imsize/2.,imsize/2.))
