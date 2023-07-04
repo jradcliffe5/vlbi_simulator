@@ -47,7 +47,7 @@ if part == 1:
 
 	## Generate itrfs
 	antennae = ast.literal_eval(inputs['antennae'])
-	commands.append('%s %s/simulations/make_itrf.py %s'%(inputs['CASA_exec'], rpath, " ".join(antennae)))
+	commands.append('%s %s/simulations/make_itrf.py %s %s'%(inputs['CASA_exec'], rpath, sys.argv[i]," ".join(antennae)))
 
 	## Generate measurement set
 	commands.append('%s %s/simulations/make_measurement_set.py single %s %s'%(inputs['stimela_exec'],rpath, sys.argv[i], sys.argv[i+1]))
