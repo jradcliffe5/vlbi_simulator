@@ -1,4 +1,4 @@
-import os,sys,re
+import os,sys,json
 from collections import OrderedDict
 import numpy as np
 from scipy import constants as c
@@ -460,62 +460,6 @@ def add_pt_src(msfile,pt_flux):
 	#uvsub(vis=msfile,reverse=True)
 	os.system('rm -r %s.cl'%msfile)
 
-
-evn_SEFD = {'L':{
-				'Ef':[19,76],
-				'Tm65':[39,65],
-				'Jb1':[65,67],
-				'W1':[560,25],
-				'On':[350,25],
-				'Mc':[700,32],
-				'Tr':[300,32],
-				'Nt':[740,25],
-				'Sv':[360,32],
-				'Bd':[330,32],
-				'Zc':[300,32],
-				'Ur':[300,25],
-				'Cm':[212,32],
-				'Da':[450,25],
-				'Kn':[400,25],
-				'Pi':[450,25],
-				'De':[350,25],
-				'Sh':[670,25],
-				'Ir':[3600,25],
-				'Jb2':[320,25],
-				'Ys':[160,25],
-				'Sc':[365,25],
-				'Hn':[365,25],
-				'Nl':[365,25],
-				'Fd':[365,25],
-				'La':[365,25],
-				'Kp':[365,25],
-				'Pt':[365,25],
-				'Ov':[365,25],
-				'Br':[365,25],
-				'Mk':[365,25]},
-			'C':{'Ef':[20,76],
-				'Tm65':[39,65],
-				'Jb1':[40,67],
-				'W1':[840,25],
-				'On':[600,25],
-				'Mc':[170,32],
-				'Tr':[220,32],
-				'Nt':[260,25],
-				'Sv':[250,32],
-				'Bd':[200,32],
-				'Zc':[400,32],
-				'Ur':[200,25],
-				'Cm':[136,32],
-				'Da':[325,25],
-				'Kn':[325,25],
-				'Pi':[325,25],
-				'De':[1000,25],
-				'Sh':[720,25],
-				'Ir':[430,25],
-				'Jb2':[320,25],
-				'Ys':[160,25]}
-			}
-
 ## Imports input_file
 try:
 	i = sys.argv.index("-c") + 2
@@ -539,6 +483,10 @@ else:
 	print('band not supported')
 	sys.exit()
 
+## Load sefds and diameters
+f = open('ant_info.json',)
+evn_SEFD = json.load(f)
+f.close()
 
 ms = '%s/%s_single_pointing.ms'%(inputs['output_path'],inputs['prefix'])
 imsize = int(inputs['size'])
@@ -554,7 +502,7 @@ print('Add simple noise')
 add_noise(msfile=ms,datacolumn='CORRECTED_DATA',evn_SEFD=sefd_ants,adjust_time=adjust_time)
 
 
-print('Make image')
+print('Making image')
 rmdirs(glob.glob('%s_IM.*'%ms.split('.ms')[0]))
 tclean(vis=ms,
 	   imagename='%s_IM'%ms.split('.ms')[0],

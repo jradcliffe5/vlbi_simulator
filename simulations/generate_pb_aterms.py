@@ -1,9 +1,9 @@
-import os, sys
+import os, sys, json
 from collections import OrderedDict
 import numpy as np
 from scipy import constants as c
 import pickle
-
+from simulator_functions import *
 try:
 	# CASA 6
 	import casatools
@@ -130,25 +130,15 @@ def rescale_synthetic_HPBW(header,c_freq,diameter,vmodel,a_term_upscale,phase_ce
 		ret_singular = True
 	
 	### Open voltage model
-	#print('open fits')
 	hdu = fits.open(vmodel)
 	vhead = hdu[0].header
-	#print('reorder fits')
 	vdata = hdu[0].data.squeeze()
 	vdata = vdata.byteswap().newbyteorder()
 	hdu.close()
 	
 	### Rotate data
-	#try:
-	#print('sklearn rotate')
 	ct = np.where(vdata==vdata.max())
-	#print('rotate')
-	#print(vdata.shape,para_angle,ct[0][0],ct[1][0])
 	vdata = rotate(image=vdata,angle=para_angle,center=[ct[0][0],ct[1][0]])
-	#except:
-	#from scipy.ndimage import rotate
-	#print('scipy rotate')
-	#vdata = rotate(input=vdata,angle=para_angle,reshape=False)
 	
 	### Rescale model to diameter
 	vhead['CDELT1'] = vhead['CDELT1']*(vhead['DIAMETER']/diameter)
@@ -204,64 +194,37 @@ def rescale_synthetic_HPBW(header,c_freq,diameter,vmodel,a_term_upscale,phase_ce
 		hc = hdu_cut.data.shape
 		return hdu_cut.data[int(hc[0]/2),int(hc[1]/2)]
 
+try:
+	i = sys.argv.index("-c") + 2
+except:
+	i = 1
+	pass
 
+inputs = headless(sys.argv[i])
+adv_inputs = headless(sys.argv[i+1])
+ms = '%s/%s_single_pointing.ms'%(inputs['output_path'],inputs['prefix'])
+obs_freq = float(inputs['obs_freq'])
+if (obs_freq > 1.0) & (obs_freq < 2.0):
+	band='L'
+elif (obs_freq > 2.0) & (obs_freq < 3.5):
+	band='S'
+elif (obs_freq > 3.5) & (obs_freq < 7.5):
+	band='C'
+elif (obs_freq > 7.5):
+	band='K'
+else:
+	print('band not supported')
+	sys.exit()
+tb = casatools.table()
+qa = casatools.quanta()
+me = casatools.measures()
 
-evn_SEFD = {'L':{
-				'Ef':[19,76],
-				'Tm65':[39,65],
-				'Jb1':[65,67],
-				'W1':[560,25],
-				'On':[350,25],
-				'Mc':[700,32],
-				'Tr':[300,32],
-				'Nt':[740,25],
-				'Sv':[360,32],
-				'Bd':[330,32],
-				'Zc':[300,32],
-				'Ur':[300,25],
-				'Cm':[212,32],
-				'Da':[450,25],
-				'Kn':[400,25],
-				'Pi':[450,25],
-				'De':[350,25],
-				'Sh':[670,25],
-				'Ir':[3600,25],
-				'Jb2':[320,25],
-				'Ys':[160,25],
-				'Sc':[365,25],
-				'Hn':[365,25],
-				'Nl':[365,25],
-				'Fd':[365,25],
-				'La':[365,25],
-				'Kp':[365,25],
-				'Pt':[365,25],
-				'Ov':[365,25],
-				'Br':[365,25],
-				'Mk':[365,25]},
-			'C':{'Ef':[20,76],
-				'Tm65':[39,65],
-				'Jb1':[40,67],
-				'W1':[840,25],
-				'On':[600,25],
-				'Mc':[170,32],
-				'Tr':[220,32],
-				'Nt':[260,25],
-				'Sv':[250,32],
-				'Bd':[200,32],
-				'Zc':[400,32],
-				'Ur':[200,25],
-				'Cm':[136,32],
-				'Da':[325,25],
-				'Kn':[325,25],
-				'Pi':[325,25],
-				'De':[1000,25],
-				'Sh':[720,25],
-				'Ir':[430,25],
-				'Jb2':[320,25],
-				'Ys':[160,25]}
-			}
+if int(sys.argv[i+2]) == 1:
+	do_all_freqs = True
+else:
+	do_all_freqs = False
 
-if int(sys.argv[3]) == 1:
+if int(sys.argv[i+3]) == 1:
 	if os.path.exists('../D_eff_errs.pkl'):
 		infile = open('../D_eff_errs.pkl','rb')
 		evn_SEFD = pickle.load(infile)
@@ -273,15 +236,9 @@ if int(sys.argv[3]) == 1:
 		pickle.dump(evn_SEFD,outfile)
 		outfile.close()
 
-ms = sys.argv[1]
-band = str(sys.argv[5])
-if int(sys.argv[2]) == 1:
-	do_all_freqs = True
-else:
-	do_all_freqs = False
-if int(sys.argv[4]) >= 1:
+if int(sys.argv[i+4]) >= 1:
 	do_time_rotation = True
-	if int(sys.argv[4]) == 2:
+	if int(sys.argv[i+4]) == 2:
 		dont_rotate = True
 	else:
 		dont_rotate = False
@@ -289,19 +246,22 @@ else:
 	do_time_rotation = False
 	dont_rotate = True
 
-tb = casatools.table()
-qa = casatools.quanta()
-me = casatools.measures()
 try:
 	ang_off = float(ms.split('_')[1]) + float(ms.split('_')[2].split('.ms')[0])/60.
 	degree_off = ang_off/60.
 	diffcorr = False
 except:
 	diffcorr = True
+
+## Load sefds and diameters
+f = open('ant_info.json',)
+evn_SEFD = json.load(f)
+f.close()
+
 evn_sefd, evn_diams = match_to_antenna_nos(evn_SEFD[band],ms)
 nants = len(evn_diams.values())
 
-os.system('rm -r %s.mask'%ms)
+rmdirs(['%s.mask'%ms.split('.ms')[0]])
 ia = casatools.image()
 ia.open('%s_IM.image'%ms.split('.ms')[0])
 imsize=ia.shape()[0] 
@@ -352,7 +312,6 @@ if do_time_rotation == True:
 else:
 	header['CRVAL6']  =                   1.
 	header['CDELT6']  =             1.0E+20
-print(header['CRVAL5'])
 
 if do_time_rotation == True:
 	print('rotating')
