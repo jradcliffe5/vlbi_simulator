@@ -35,10 +35,6 @@ except:
 	from io import StringIO
 
 def parallacticAngle(msfile,times):
-	#measure = pm.measures()
-	#tab = pt.table(msfile, readonly=True,ack=False)
-	#field_tab = pt.table(tab.getkeyword('FIELD'),ack=False)
-	#direction = np.squeeze(field_tab.getcol('PHASE_DIR'))
 	tb = casatools.table()
 	qa = casatools.quanta()
 	me = casatools.measures()

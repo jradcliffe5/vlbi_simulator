@@ -18,10 +18,9 @@ except:
 
 ## Load global inputs
 inputs = headless(sys.argv[i])
-adv_inputs = headless(sys.argv[i+1])
 
 
-hdu = fits.open('single_pointing-beam-I.fits')
+hdu = fits.open('%s/%s_single_pointing-beam-I.fits'%(inputs['output_path'],inputs['prefix']))
 cdelt=np.abs(hdu[0].header['CDELT1'])
 data = hdu[0].data.squeeze()
 w = WCS(hdu[0].header,naxis=2)
@@ -77,4 +76,3 @@ plt.clf()
 fwhm = np.mean([g.x_stddev.value*2*np.sqrt(2*np.log(2))*cdelt,g.y_stddev.value*2*np.sqrt(2*np.log(2))*cdelt])
 print(fwhm)
 np.save("%s/PB_fit.npy"%(inputs['output_path']),fwhm)
-
