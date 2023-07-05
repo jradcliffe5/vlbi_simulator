@@ -1,5 +1,5 @@
 import numpy as np
-import os, ast
+import os, ast, sys
 import casatools
 from casatasks import *
 from simulator_functions import headless
