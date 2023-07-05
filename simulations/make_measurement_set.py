@@ -123,7 +123,7 @@ elif sys.argv[1] == 'M':
 		print('Making %s_mosaic_%s.ms with direction ra=%s, dec=%s'%(prefix,i,direction[i][0],direction[i][1]))
 		rmdirs(['%s/%s_mosaic_%s.ms'%(output, prefix, i)])
 		MS='%s/%s_mosaic_%s.ms'%(output, prefix, i)
-		dt = datetime.strptime(adv_inputs['start_time'], '%d %b %Y') #+ timedelta(hours=2/60+(0*total_time/float(len(direction))))
+		dt = datetime.strptime(adv_inputs['time_start'], '%d %b %Y') #+ timedelta(hours=2/60+(0*total_time/float(len(direction))))
 		simms.create_empty_ms(
 		msname=MS,
 		label=None,
