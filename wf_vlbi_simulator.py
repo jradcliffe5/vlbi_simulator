@@ -107,7 +107,7 @@ if part==2:
 		write_hpc_headers(step,params)
 
 		## Make mosaic
-		commands.append('%s %s/simulations/make_mosaic.py'%(inputs['CASA_exec'],rpath))
+		commands.append('%s %s/simulations/make_mosaic.py %s'%(inputs['CASA_exec'],rpath,sys.argv[i]))
 
 		## Make rms map
 		commands.append('%s %s/mosaic.linmos.fits'%(inputs['rms_exec'],inputs['output_path']))
