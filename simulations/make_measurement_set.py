@@ -108,7 +108,7 @@ if sys.argv[i] == 'S':
 	optimise_start=None
 	)
 elif sys.argv[1] == 'M':
-	with open('mosaic.csv') as f:
+	with open('%s/mosaic.csv'%inputs['output_path']) as f:
 		lines = f.readlines()
 	direction = []
 	for i in lines:
