@@ -66,8 +66,8 @@ if part == 1:
 		commands.append('%s %s/single_pointing-image-pb.fits'%(inputs['rms_exec'],inputs['output_path']))
 			
 	else:
-		commands.append('%s %s/simulations/fit_pb.py %s'%(rpath, inputs['CASA_exec'],sys.argv[i]))
-		commands.append('%s %s/simulations/generate_mosaic_pointings.py %s'%(rpath, inputs['CASA_exec'],sys.argv[i]))
+		commands.append('%s %s/simulations/fit_pb.py %s'%(inputs['CASA_exec'],rpath, sys.argv[i]))
+		commands.append('%s %s/simulations/generate_mosaic_pointings.py %s'%(inputs['CASA_exec'],rpath,sys.argv[i]))
 		commands.append('%s %s/simulations/make_measurement_set.py M %s %s'%(inputs['stimela_exec'],rpath, sys.argv[i], sys.argv[i+1]))
 
 	with open('job_%s.%s'%(step,params['job_manager']), 'a') as filehandle:
