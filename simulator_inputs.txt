@@ -52,6 +52,7 @@ mosaic                = True                       # Make a mosaic
 mosaic_area           = [2,2]                      # Mosaic area in degrees    
 mosaic_filling_factor = 2.0                        # Filling factor for mosaic (increase if want non-uniform sensitivity)
 custom_mosaic         = custom_mosaic.txt       # Give custom positions (will override area if set)
+
 ###-----------------###
 ###     Imaging     ###
 ###-----------------###

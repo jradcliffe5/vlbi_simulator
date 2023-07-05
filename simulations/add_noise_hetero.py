@@ -467,8 +467,8 @@ except:
 	i = 1
 	pass
 
-inputs = headless(sys.argv[i])
-adv_inputs = headless(sys.argv[i+1])
+inputs = headless(sys.argv[i+1])
+adv_inputs = headless(sys.argv[i+2])
 
 obs_freq = float(inputs['obs_freq'])
 if (obs_freq > 1.0) & (obs_freq < 2.0):
@@ -480,30 +480,41 @@ elif (obs_freq > 3.5) & (obs_freq < 7.5):
 elif (obs_freq > 7.5):
 	band='K'
 else:
-	print('band not supported')
+	print('Band not supported')
 	sys.exit()
 
 ## Load sefds and diameters
 f = open('%s/simulations/ant_info.json'%inputs['repo_path'],)
 evn_SEFD = json.load(f)
 f.close()
+if sys.argv[i] == 'S':
+	ms = '%s/%s_single_pointing.ms'%(inputs['output_path'],inputs['prefix'])
+elif sys.argv[i].startswith('M'):
+	ms = '%s/%s_mosaic_%s.ms'%(inputs['output_path'],inputs['prefix'],sys.argv[i].split('M')[1])
+else:
+	print('Incorrect input')
+	sys.exit()
 
-ms = '%s/%s_single_pointing.ms'%(inputs['output_path'],inputs['prefix'])
-imsize = int(inputs['size'])
-cell = str(inputs['cell'])
 adjust_time = float(inputs['time_multiplier'])
+
 print('Clearing calibration')
 clearcal(vis=ms)
+
 print('Write elevation dependent flags')
 write_flag(ms,0,check_elevation(ms,custom_xyz=True),make_baseline_dictionary(ms))
+
 print('Match antennae to sefds')
 sefd_ants, diams_ants = match_to_antenna_nos(evn_SEFD[band],ms)
+
 print('Add simple noise')
 add_noise(msfile=ms,datacolumn='CORRECTED_DATA',evn_SEFD=sefd_ants,adjust_time=adjust_time)
 
-
 print('Making image')
 rmdirs(glob.glob('%s_IM.*'%ms.split('.ms')[0]))
+
+imsize = int(inputs['size'])
+cell = str(inputs['cell'])
+
 tclean(vis=ms,
 	   imagename='%s_IM'%ms.split('.ms')[0],
 	   cell=cell,

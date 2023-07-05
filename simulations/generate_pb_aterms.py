@@ -200,9 +200,16 @@ except:
 	i = 1
 	pass
 
-inputs = headless(sys.argv[i])
-adv_inputs = headless(sys.argv[i+1])
-ms = '%s/%s_single_pointing.ms'%(inputs['output_path'],inputs['prefix'])
+inputs = headless(sys.argv[i+4])
+adv_inputs = headless(sys.argv[i+5])
+if sys.argv[i+3] == 'S':
+	ms = '%s/%s_single_pointing.ms'%(inputs['output_path'],inputs['prefix'])
+elif sys.argv[i+3].startswith('M'):
+	ms = '%s/%s_mosaic_%s.ms'%(inputs['output_path'],inputs['prefix'],sys.argv[i+3].split('M')[1])
+else:
+	print('Incorrect input')
+	sys.exit()
+
 obs_freq = float(inputs['obs_freq'])
 if (obs_freq > 1.0) & (obs_freq < 2.0):
 	band='L'
@@ -215,16 +222,17 @@ elif (obs_freq > 7.5):
 else:
 	print('band not supported')
 	sys.exit()
+
 tb = casatools.table()
 qa = casatools.quanta()
 me = casatools.measures()
 
-if int(sys.argv[i+2]) == 1:
+if int(sys.argv[i]) == 1:
 	do_all_freqs = True
 else:
 	do_all_freqs = False
 
-if int(sys.argv[i+3]) == 1:
+if int(sys.argv[i+1]) == 1:
 	if os.path.exists('../D_eff_errs.pkl'):
 		infile = open('../D_eff_errs.pkl','rb')
 		evn_SEFD = pickle.load(infile)
@@ -236,9 +244,9 @@ if int(sys.argv[i+3]) == 1:
 		pickle.dump(evn_SEFD,outfile)
 		outfile.close()
 
-if int(sys.argv[i+4]) >= 1:
+if int(sys.argv[i+2]) >= 1:
 	do_time_rotation = True
-	if int(sys.argv[i+4]) == 2:
+	if int(sys.argv[i+2]) == 2:
 		dont_rotate = True
 	else:
 		dont_rotate = False

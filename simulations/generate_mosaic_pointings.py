@@ -1,6 +1,5 @@
 import matplotlib
 matplotlib.use('Agg')
-
 import numpy as np
 import os, ast, sys
 from astropy.coordinates import SkyCoord
@@ -8,13 +7,16 @@ from astropy.visualization.wcsaxes import SphericalCircle
 import matplotlib.pyplot as plt
 from astropy import wcs
 import astropy.units as u
-from astropy.io import fits
-from matplotlib.colors import SymLogNorm
 import pandas as pd
 
 from simulator_functions import *
 
-inputs = headless('simulator_inputs.txt') ## replace with sys.argv
+try:
+	i = sys.argv.index("-c") + 2
+except:
+	i = 1
+	pass
+inputs = headless(sys.argv[i])
 
 
 def generate_rectangle(x_fov,y_fov,RA_centre,Dec_centre,theta):
@@ -111,7 +113,6 @@ def mosaic_pointings_square(centre_ra, centre_dec, ra_fov, dec_fov, theta, point
 		print(ptgstring,file=ptgfile)
 	ptgfile.close()
 	return coords
-	#return ra_mosaic_buffer, dec_mosaic_buffer, half_pb, pointing_counter, coords
 
 def hyp(co_a,co_b):
 	return np.sqrt(np.abs(co_a[0]-co_b[0])**2. + np.abs(co_a[1]-co_b[1])**2)
@@ -138,10 +139,8 @@ def rotate(xy, theta):
 		xy[0] * cos_theta - xy[1] * sin_theta,
 		xy[0] * sin_theta + xy[1] * cos_theta])
 
-
 def translate(xy, offset):
 	return np.array([xy[0] + offset[0], xy[1] + offset[1]])
-
 
 def determine_in_out(coords,point):
 	triangle_areas = []
@@ -196,6 +195,7 @@ def str_inp_convert(string):
 			ms2 = string.split(',')
 			ms2_inp = ' '.join(ms2)
 	return ms2_inp
+
 def convert_frac_to_float(frac_str):
 	try:
 		return float(frac_str)
@@ -208,9 +208,6 @@ def convert_frac_to_float(frac_str):
 			whole = 0
 		frac = float(num) / float(denom)
 		return whole - frac if whole < 0 else whole + frac
-
-# In[12]:
-
  
 if str(inputs['custom_mosaic']) == '':
 	cm=False
@@ -259,8 +256,6 @@ w = generate_central_wcs([c.ra.deg,c.dec.deg],[1/60,1/60],[1,1])
 fig = plt.figure(1,figsize=(9,9))
 ax = fig.add_subplot(111,projection=w)
 ax.scatter(df['RA'],df['DEC'],c='k',s=2,transform=ax.get_transform('world'))
-#ax.scatter(t['RA'],t['DEC'],transform=ax.get_transform('world'),s=1)
-
 
 for i,j in enumerate(df.RANGE):
 	if i == 0:
@@ -274,10 +269,3 @@ for i,j in enumerate(df.RANGE):
 ax.set_ylabel('Declination (J2000)')
 ax.set_xlabel('Right Ascension (J2000)')
 fig.savefig('%s/mosaic_pointings.pdf'%inputs['output_path'])
-
-
-# In[ ]:
-
-
-
-

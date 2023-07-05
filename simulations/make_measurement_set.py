@@ -5,9 +5,15 @@ from datetime import datetime, timedelta
 from simulator_functions import headless, rmdirs, rmfiles
 import sys
 
+try:
+	i = sys.argv.index("-c") + 2
+except:
+	i = 1
+	pass
+
 ## Import inputs
-inputs = headless(sys.argv[2])
-adv_inputs = headless(sys.argv[3])
+inputs = headless(sys.argv[i+1])
+adv_inputs = headless(sys.argv[i+2])
 output = str(inputs['output_path'])
 try:
 	prefix = str(inputs['prefix'])
@@ -57,7 +63,7 @@ else:
 pointing_centre = ast.literal_eval(inputs['field_centre'])
 
 ## Single pointing simms command
-if sys.argv[1] == 'single':
+if sys.argv[i] == 'S':
 	# Delete ms if it exists and MS variable
 	rmdirs(['%s/%s_single_pointing.ms'%(output,prefix)])
 	MS='%s/%s_single_pointing.ms'%(output,prefix)
@@ -101,7 +107,7 @@ if sys.argv[1] == 'single':
 	auto_corr=False,
 	optimise_start=None
 	)
-elif sys.argv[1] == 'mosaic':
+elif sys.argv[1] == 'M':
 	with open('mosaic.csv') as f:
 		lines = f.readlines()
 	direction = []
