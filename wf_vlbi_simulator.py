@@ -80,7 +80,7 @@ if part==2:
 		step = 'mosaic'
 		write_hpc_headers(step,params)
 
-		commands.append('array=(%s/%s_mosaic_*.ms)'%(inputs['output_path'],inputs['prefix']))
+		commands.append('array=($(ls -d %s/%s_mosaic_*.ms | sort -V))'%(inputs['output_path'],inputs['prefix']))
 		commands.append('len=${#array[@]}')
 		commands.append('a=$SLURM_ARRAY_TASK_ID')
 		## Add noise to all ms

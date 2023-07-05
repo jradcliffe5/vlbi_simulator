@@ -515,13 +515,14 @@ rmdirs(glob.glob('%s_IM.*'%ms.split('.ms')[0]))
 imsize = int(inputs['size'])
 cell = str(inputs['cell'])
 
-tclean(vis=ms,
-	   imagename='%s_IM'%ms.split('.ms')[0],
-	   cell=cell,
-	   imsize=[imsize,imsize],
-	   deconvolver='clarkstokes',
-	   niter=int(1e5),
-	   nsigma=1.2,
-	   usemask='user',
-       pblimit=1e-10,
-	   mask='circle[[%dpix, %dpix], 5pix]'%(imsize/2.,imsize/2.))
+if inputs['mosaic'] == 'False':
+	tclean(vis=ms,
+		imagename='%s_IM'%ms.split('.ms')[0],
+		cell=cell,
+		imsize=[imsize,imsize],
+		deconvolver='clarkstokes',
+		niter=int(1e5),
+		nsigma=1.2,
+		usemask='user',
+		pblimit=1e-10,
+		mask='circle[[%dpix, %dpix], 5pix]'%(imsize/2.,imsize/2.))
