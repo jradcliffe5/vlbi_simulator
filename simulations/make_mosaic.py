@@ -69,4 +69,4 @@ else:
 	for i in range(len(ims)):
 		lm.makemosaic(images=ims[i], weightimages=pbs[i],weighttype=1,imageweighttype=0)
 	exportfits(imagename='%s/%s_mosaic.linmos'%(inputs['output_path'],inputs['prefix']),fitsimage='%s/%s_mosaic.linmos,fits'%(inputs['output_path'],inputs['prefix']),overwrite=True)
-	exportfits(imagename='%s/%s_mosaic.weightlinmos'%(inputs['output_path'],inputs['prefix'])],fitsimage='%s/%s_mosaic.weightlinmos.fits'%(inputs['output_path'],inputs['prefix']),overwrite=True)
+	exportfits(imagename='%s/%s_mosaic.weightlinmos'%(inputs['output_path'],inputs['prefix']),fitsimage='%s/%s_mosaic.weightlinmos.fits'%(inputs['output_path'],inputs['prefix']),overwrite=True)
