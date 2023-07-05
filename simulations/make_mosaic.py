@@ -2,7 +2,7 @@ import numpy as np
 import os, ast, sys
 import casatools
 from casatasks import *
-from simulator_functions import headless
+from simulator_functions import *
 try:
 	from astropy.io import fits
 except:
