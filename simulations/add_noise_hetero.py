@@ -515,7 +515,7 @@ rmdirs(glob.glob('%s_IM.*'%ms.split('.ms')[0]))
 imsize = int(inputs['size'])
 cell = str(inputs['cell'])
 
-if inputs['mosaic'] == 'False':
+if sys.argv[i] == 'S':
 	tclean(vis=ms,
 		imagename='%s_IM'%ms.split('.ms')[0],
 		cell=cell,
