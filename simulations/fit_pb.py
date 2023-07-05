@@ -7,7 +7,7 @@ from astropy.io import fits
 from simulator_functions import headless
 from astropy.wcs import WCS
 from matplotlib.gridspec import GridSpec
-
+import sys
 
 ## Imports input_file
 try:
