@@ -254,7 +254,7 @@ except:
 	diffcorr = True
 
 ## Load sefds and diameters
-f = open('ant_info.json',)
+f = open('%s/simulations/ant_info.json'%inputs['repo_path'],)
 evn_SEFD = json.load(f)
 f.close()
 
