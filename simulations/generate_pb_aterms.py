@@ -269,7 +269,7 @@ f.close()
 evn_sefd, evn_diams = match_to_antenna_nos(evn_SEFD[band],ms)
 nants = len(evn_diams.values())
 
-rmdirs(['%s.mask'%ms.split('.ms')[0]])
+rmdirs(['%s.mask'%ms])
 ia = casatools.image()
 ia.open('%s_IM.image'%ms.split('.ms')[0])
 imsize=ia.shape()[0] 

@@ -1,6 +1,5 @@
 import matplotlib
 matplotlib.use('Agg')
-
 import numpy as np
 import matplotlib.pyplot as plt
 from astropy.modeling import models, fitting
@@ -10,7 +9,16 @@ from astropy.wcs import WCS
 from matplotlib.gridspec import GridSpec
 
 
-inputs = headless('simulator_inputs.txt')
+## Imports input_file
+try:
+	i = sys.argv.index("-c") + 2
+except:
+	i = 1
+	pass
+
+## Load global inputs
+inputs = headless(sys.argv[i])
+adv_inputs = headless(sys.argv[i+1])
 
 
 hdu = fits.open('single_pointing-beam-I.fits')
@@ -18,10 +26,6 @@ cdelt=np.abs(hdu[0].header['CDELT1'])
 data = hdu[0].data.squeeze()
 w = WCS(hdu[0].header,naxis=2)
 y, x = np.mgrid[:data.shape[0], :data.shape[1]]
-
-
-# In[17]:
-
 
 # Fit the data using a Gaussian
 g_init = models.Gaussian2D(amplitude=1., x_mean=data.shape[0]//2,y_mean=data.shape[1]//2, x_stddev=1.,y_stddev=1.)
@@ -31,10 +35,6 @@ g_air = models.AiryDisk2D(amplitude=1., x_0=data.shape[0]//2,y_0=data.shape[1]//
 g_air.amplitude.fixed = True
 g = fit_g(g_init, x,y,data,weights=(data/data.max())**2)
 g_air = fit_g(g_air, x,y,data,weights=(data/data.max())**2)
-
-
-# In[18]:
-
 
 fig = plt.figure(figsize=(27, 10))
 gs = GridSpec(nrows=1,ncols=4,wspace=0.05)
@@ -64,9 +64,6 @@ ax.set_xlabel('')
 fig.savefig('%s/Primary_beam_fit_2D.pdf'%(inputs['output_path']))
 plt.clf()
 
-# In[19]:
-
-
 fig = plt.figure()
 ax = fig.add_subplot(111)
 _x = np.linspace(-1*cdelt*data.shape[0]/2,cdelt*data.shape[1]/2,data.shape[0])
@@ -76,10 +73,6 @@ ax.plot(_x,g_air(x, y)[data.shape[0]//2,:],c='r',ls=':',label='Airy')
 ax.legend()
 fig.savefig('%s/Primary_beam_fit_1D.pdf'%(inputs['output_path']))
 plt.clf()
-
-
-# In[25]:
-
 
 fwhm = np.mean([g.x_stddev.value*2*np.sqrt(2*np.log(2))*cdelt,g.y_stddev.value*2*np.sqrt(2*np.log(2))*cdelt])
 print(fwhm)
