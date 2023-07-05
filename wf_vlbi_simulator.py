@@ -84,13 +84,13 @@ if part==2:
 		commands.append('len=${#array[@]}')
 		commands.append('a=$SLURM_ARRAY_TASK_ID')
 		## Add noise to all ms
-		commands.append('%s simulations/add_noise_hetero.py ${array[$a]} %d %.3f %s %s'%(inputs['CASA_exec'],int(inputs['size']),float(inputs['time_multiplier']),band,inputs['cell']))
+		commands.append('%s %s/simulations/add_noise_hetero.py M$a %s %s'%(inputs['CASA_exec'],rpath, sys.argv[i], sys.argv[i+1]))
 
 		## Make all a terms
-		commands.append('%s simulations/generate_pb_aterms.py ${array[$a]} 0 0 0 %s'%(inputs['CASA_exec'],band))
+		commands.append('%s %s/simulations/generate_pb_aterms.py 0 0 0 M$a %s %s'%(inputs['CASA_exec'], rpath, sys.argv[i], sys.argv[i+1]))
 
 		## Unzip a terms
-		commands.append('gunzip -f ${array[$a]}\"_pb_flat_norotate.fits.gz\"')
+		#commands.append('gunzip -f ${array[$a]}\"_pb_flat_norotate.fits.gz\"')
 
 		## Make images
 		commands.append('%s -name %s/${array[$a]}_IM -no-update-model-required --aterm-kernel-size 157 -weight %s -scale %s -niter 1 -mgain 0.9 -auto-threshold 0.5 -auto-mask 4 -use-idg -idg-mode hybrid -aterm-config ${array[$a]}_aterm_norotate_config.txt -size %d %d ${array[$a]}'%(inputs['wsclean_exec'],inputs['output_path'],inputs['weight'],inputs['cell'],int(inputs['size']),int(inputs['size'])))
