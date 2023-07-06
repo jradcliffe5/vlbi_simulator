@@ -1,6 +1,4 @@
 import numpy as np
-import os
-import casatools
 from casatasks import *
 casalog.showconsole(True)
 import sys

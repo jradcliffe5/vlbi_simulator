@@ -96,7 +96,7 @@ if part==2:
 		commands.append('%s -name %s/${array[$a]}_IM -no-update-model-required --aterm-kernel-size 157 -weight %s -scale %s -niter 1 -mgain 0.9 -auto-threshold 0.5 -auto-mask 4 -use-idg -idg-mode hybrid -aterm-config ${array[$a]}_aterm_norotate_config.txt -size %d %d ${array[$a]}'%(inputs['wsclean_exec'],inputs['output_path'],inputs['weight'],inputs['cell'],int(inputs['size']),int(inputs['size'])))
 
 		## Convert to casa ims
-		commands.append('%s simulations/convert_fits_to_casa.py ${array[$a]}'%inputs['CASA_exec'])
+		commands.append('%s %s/simulations/convert_fits_to_casa.py ${array[$a]}'%(inputs['CASA_exec'],rpath))
 
 		with open('job_%s.%s'%(step,params['job_manager']), 'a') as filehandle:
 			for listitem in commands:
