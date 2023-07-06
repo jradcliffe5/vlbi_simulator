@@ -199,7 +199,7 @@ except:
 inputs = headless(sys.argv[i+4])
 adv_inputs = headless(sys.argv[i+5])
 if sys.argv[i+3] == 'S':
-	ms = '%s/%s_single_pointing.ms'%(inputs['output_path'],inputs['prefix'])
+	ms = '%s/%s.ms'%(inputs['output_path'],inputs['prefix'])
 elif sys.argv[i+3].startswith('M'):
 	ms = '%s/%s_mosaic_%s.ms'%(inputs['output_path'],inputs['prefix'],sys.argv[i+3].split('M')[1])
 else:
@@ -407,8 +407,6 @@ else:
 			corr = np.sqrt(calc_hpbw(ang_off,evn_diams[i],c_freq))
 			x[:,:,i,0,:,:] = corr
 			x[:,:,i,2,:,:] = corr
-
-
 
 hdu = fits.PrimaryHDU(x,header)
 header = hdu.header

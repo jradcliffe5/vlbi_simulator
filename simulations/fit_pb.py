@@ -20,7 +20,7 @@ except:
 inputs = headless(sys.argv[i])
 
 
-hdu = fits.open('%s/%s_single_pointing-beam-I.fits'%(inputs['output_path'],inputs['prefix']))
+hdu = fits.open('%s/%s-beam-I.fits'%(inputs['output_path'],inputs['prefix']))
 cdelt=np.abs(hdu[0].header['CDELT1'])
 data = hdu[0].data.squeeze()
 w = WCS(hdu[0].header,naxis=2)

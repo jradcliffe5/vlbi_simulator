@@ -65,14 +65,14 @@ pointing_centre = ast.literal_eval(inputs['field_centre'])
 ## Single pointing simms command
 if sys.argv[i] == 'S':
 	# Delete ms if it exists and MS variable
-	rmdirs(['%s/%s_single_pointing.ms'%(output,prefix)])
-	MS='%s/%s_single_pointing.ms'%(output,prefix)
+	rmdirs(['%s/%s.ms'%(output,prefix)])
+	MS='%s/%s.ms'%(output,prefix)
 
 	# Round the time on source as that was causing splits in scan lengths
 	tos = np.round(tos,5)
 
 	# Simms command
-	print('Making single pointing ms - %s_single_pointing.ms with the following parameters'%prefix)
+	print('Making single pointing ms - %s.ms with the following parameters'%prefix)
 	print('Total time on source: %.2f hr, integration time = %.2f s'%(tos,int_time))
 	print('Bandwidth: %.6f MHz, number channels: %d'%(bw,nchan))
 	simms.create_empty_ms(

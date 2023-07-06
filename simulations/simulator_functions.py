@@ -121,6 +121,11 @@ def write_hpc_headers(step,params):
 		for listitem in hpc_header:
 			filehandle.write('%s\n' % listitem)
 
+def write_job(step,commands,job_manager):
+	with open('./job_%s.%s'%(step,job_manager), 'a') as filehandle:
+			for listitem in commands:
+				filehandle.write('%s\n' % listitem)
+
 def rmfiles(files):
 	func_name = inspect.stack()[0][3]
 	for i in files:

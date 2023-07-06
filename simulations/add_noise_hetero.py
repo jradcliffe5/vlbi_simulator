@@ -488,7 +488,7 @@ f = open('%s/simulations/ant_info.json'%inputs['repo_path'],)
 evn_SEFD = json.load(f)
 f.close()
 if sys.argv[i] == 'S':
-	ms = '%s/%s_single_pointing.ms'%(inputs['output_path'],inputs['prefix'])
+	ms = '%s/%s.ms'%(inputs['output_path'],inputs['prefix'])
 elif sys.argv[i].startswith('M'):
 	ms = '%s/%s_mosaic_%s.ms'%(inputs['output_path'],inputs['prefix'],sys.argv[i].split('M')[1])
 else:
