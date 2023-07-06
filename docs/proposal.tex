@@ -1,0 +1,62 @@
+% !TEX spellcheck = en_GB
+% !TEX program = lualatex
+\documentclass[11pt]{report_jfr}
+\usepackage{multirow}
+\usepackage{multirow}
+\usepackage{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{titling}
+\usepackage{hhline}
+\usepackage{color}
+\usepackage{colortbl}
+%\usepackage[scaled=0.92]{helvet}
+\usepackage{longtable}
+\usepackage[colorlinks=true,urlcolor=blue,linkcolor=blue,citecolor=blue]{hyperref}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{threeparttable}
+\usepackage{pdfpages}
+\usepackage{bold-extra}
+\usepackage[font=footnotesize,labelfont=bf]{caption}
+\usepackage{natbib}
+\usepackage{fancyhdr}
+\usepackage{multibib}
+
+\newcommand{\deff}{\fontfamily{lmss}\selectfont}
+\renewcommand{\footrulewidth}{0.4pt}
+\captionsetup{labelfont={bf,footnotesize},textfont=footnotesize,labelsep=quad,font=sf}
+
+\pagestyle{fancy}
+\fancyhf{}
+
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,LO]{\fontfamily{lmss}\selectfont Dr. Jack F. Radcliffe}
+\fancyhead[RE,RO]{\fontfamily{lmss}\selectfont VLBI simulator documentation}
+\fancyfoot[CE,CO]{\fontfamily{lmss}\selectfont\thepage}
+
+\fancypagestyle{coverstyle}{\renewcommand{\headrulewidth}{0pt}\fancyhf{}
+\fancyfoot[CE,CO]{\fontfamily{lmss}\selectfont\thepage}}
+
+\setlength{\droptitle}{-2em}   % This is your set screw
+
+\title{\fontfamily{lmss}\selectfont Simple VLBI simulator documentation\vspace{-1em}}
+\date{\vspace{-3.5em}}
+\author{\fontfamily{lmss}\selectfont Dr. Jack F. Radcliffe\vspace{-2em}}
+
+\begin{document}
+\maketitle
+\thispagestyle{coverstyle}
+\fontfamily{lmss}\selectfont
+\section{Introduction}
+
+\section{Installation instructions}
+\subsection{Prerequisites}
+\subsection{Installation}
+
+\section{Quick start guide}
+\subsection{Input files}
+
+\end{document}
