@@ -22,6 +22,12 @@
 \usepackage{natbib}
 \usepackage{fancyhdr}
 \usepackage{multibib}
+\usepackage{listings}
+\lstset{
+basicstyle=\small\ttfamily,
+columns=flexible,
+breaklines=true
+}
 
 \newcommand{\deff}{\fontfamily{lmss}\selectfont}
 \renewcommand{\footrulewidth}{0.4pt}
@@ -50,13 +56,84 @@
 \maketitle
 \thispagestyle{coverstyle}
 \fontfamily{lmss}\selectfont
+
 \section{Introduction}
+This simple simulator is designed to allow measurement sets to be created that can replicate VLBI arrays at low frequencies and can include custom arrays. It was borne out of initial simulations to look at the effect of primary beam attenuation on wide-field VLBI arrays but has been now developed as a tool to assist with the production of simple VLBI data sets and mosaics. 
 
 \section{Installation instructions}
 \subsection{Prerequisites}
+The majority of the work in getting this package installed is the various packages that are required for it to function. As a result, we recommend using \texttt{singularity} as the various packages require some shared environments which can clash with each other. These singularity images are available \href{ss}{here}.
+
+If you decide not to use singularity, or want to build optimised images based on your compute architecture, then the packages you will need are the following:
+%
+\begin{itemize}
+	\item \texttt{simms} - \href{https://github.com/ratt-ru/simms}{https://github.com/ratt-ru/simms}. This package is used to generate custom empty measurement sets. YOu can also get this installed as part of the \texttt{stimela} package.
+	\item \texttt{CASA} - \href{https://casa.nrao.edu}{https://casa.nrao.edu}. We recommend the modular version of CASA as you have more control over the packages that are installed with pip. 
+	\item \texttt{python v3.10+} - you will need the \texttt{pandas}, \texttt{astropy}, \texttt{numpy}, \texttt{scipy} and \texttt{matplotlib} packages which you can install using \texttt{pip} or \texttt{conda} (depending on how you installed python).
+	\item \texttt{wsclean} with the \texttt{Image Domain Gridder} - \href{https://wsclean.readthedocs.io/en/latest/}{https://wsclean.readthedocs.io/en/latest/}. This is required if you are needing to simulate the primary beam effects and other direction-dependent effects. 
+\end{itemize}
+
 \subsection{Installation}
 
+Installation should be fairly simple and requires just a git clone of this repository (which you may have already done!). Nothing else is needed!
+
 \section{Quick start guide}
-\subsection{Input files}
+
+The simulator is pretty simple to use and just needs to have the two input file (\texttt{simulator\_inputs.txt} and \texttt{simulator\_advanced\_inputs.txt}) edited to select the array of your choice. You can copy the input files to whatever directory you want as long as they are specified when you run the simulator. The various inputs in this file and descriptions are described in Section~\ref{ss:inputfile}. The simulator comprises three different steps that are controlled by a \texttt{bash} script per step. To make these scripts, we can use the following syntax on the command line,
+%
+\begin{lstlisting}
+	singularity exec <path_to_casa_image> python <path_to_git_repository>/wf_vlbi_simulator.py <path_to_inputs>/simulator_inputs.txt <path_to_inputs>/simulator_advanced_inputs.txt <step_number>
+\end{lstlisting}
+%
+The step number corresponds to the part of the simulation you want to perform and the number corresponds to the following,
+%
+\begin{enumerate}
+	\item \textbf{single pointing} - generates a measurement set, inputs noise and makes image of a single pointing including primary beam attenuation. If a mosaic is not needed, sensitivity maps are made.
+	\item \textbf{mosaic} - produces measurement sets corresponding to a mosaic defined in the input file. Makes images of each individual measurement set.
+	\item \textbf{make image} - combines the mosaic pointing into a single mosaic and generates sensitivity maps.
+\end{enumerate}
+
+\subsection{Input files}\label{ss:inputfile}
+
+The simulator takes two input files, the \texttt{simulator\_inputs.txt} file, which you will need to edit, while the \texttt{simulator\_advanced\_inputs.txt} file is probably ok being left as default (unless you want to make exact, large data size measurement sets). The \texttt{simulator\_inputs.txt} file comprises a range of parameters that you need to set and the following subsections will describe these.
+
+\subsubsection{Software and paths}
+\begin{itemize}
+	\item \texttt{CASA\_exec}, \texttt{wsclean\_exec}, \texttt{stimela\_exec}, and \texttt{rms\_exec} - the full executable commands on how to open CASA, wsclean, stimela/simms and the rms-finding software. These must be the full command i.e., if you are using singularity then the CASA command in the input file may look something like,
+	\begin{lstlisting}
+	CASA_exec = singularity exec /idia/software/containers/casa-6.3.simg python
+	\end{lstlisting}
+	\item \texttt{output\_path} - set this to put all outputs into this folder
+	\item \texttt{repo\_path} - path to the github repository and must include the \texttt{wf\_vlbi\_simulator} part.
+	\item \texttt{prefix} - string to append to the start of all output file names. Will be set the `sim' is left empty.
+\end{itemize}
+
+\subsubsection{HPC options}
+
+The simulator is designed to be usable on both your local computer and any high-performance computing architecture which uses Slurm or PBS Pro as their job manager. For the following inputs, leaving a parameter blank means that the parameter will not be specified to the job manager (and may be set as the default value on the cluster).
+%
+\begin{itemize}
+	\item \texttt{job\_manager} - defines the job manager software (options are \texttt{slurm} or \texttt{pbspro}). If this is set to \texttt{bash} then the codes can be run on your local machine.
+	\item \texttt{partition} - selects the partition of the cluster to use.
+	\item \texttt{walltime} - maximum time requested on the cluster to run the job.
+	\item \texttt{nodes} - number of nodes requested.
+	\item \texttt{cpus} - number of CPUs per node required.
+	\item \texttt{mpiprocs} - number of tasks per node (normally good to set to the same as the number of CPUs).
+	\item \texttt{nodetype} - defines the type of node to use (not used in Slurm)
+	\item \texttt{max\_jobs} - for the steps that use multiple jobs (e.g., the mosaic step), this specifies the maximum number of jobs to be submitted at once. Setting this to \texttt{-1} means that there is no maximum limit.
+\end{itemize}
+
+\textbf{documentation in progress}
+%HPC_project_code  =  
+%partition         =  GPUV100
+%walltime          =  10:00:00
+%nodes             =     1
+%cpus              =    24
+%mpiprocs          =    24
+%nodetype          =  haswell_reg
+%max_jobs          =    -1
+%mem = 50G
+%email_progress    =  jack.f.radcliffe@gmail.com
+
 
 \end{document}
