@@ -57,8 +57,8 @@ if part == 1:
 
 	if inputs['input_model'] != '':
 		if inputs['input_model'].endswith('.fits'):
-			commands.append('cp %s %s-model.fits'%(inputs['input_model'],inputs['input_model'].split('.fits')))
-			modelprefix='%s'%inputs['input_model'].split('.fits')
+			commands.append('cp %s %s-model.fits'%(inputs['input_model'],inputs['input_model'].split('.fits')[0]))
+			modelprefix='%s'%inputs['input_model'].split('.fits')[0]
 		else:
 			commands.append('%s %s/simulations/input_model.py 0 %s' % (inputs['CASA_exec'], rpath, sys.argv[i]))
 			modelprefix='%s'%inputs['input_model']

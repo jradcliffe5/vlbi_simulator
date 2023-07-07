@@ -457,7 +457,7 @@ def add_pt_src(msfile,pt_flux):
 	cl.rename('%s.cl'%msfile)
 	cl.close()
 	ft(vis=msfile,complist='%s.cl'%msfile,usescratch=True)
-	#uvsub(vis=msfile,reverse=True)
+	uvsub(vis=msfile,reverse=True)
 	os.system('rm -r %s.cl'%msfile)
 
 ## Imports input_file
