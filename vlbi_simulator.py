@@ -8,7 +8,6 @@ sys.path.append(os.path.dirname(os.path.realpath(filename)))
 sys.path.append(os.path.dirname(os.path.realpath(filename))+"/simulations")
 
 from simulator_functions import *
-from wf_vlbi_functions import headless
 
 ## Imports input_file
 try:
