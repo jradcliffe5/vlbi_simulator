@@ -17,6 +17,6 @@ if part == 0:
 	exportfits(imagename='%s'%inputs['input_model'],fitsimage='%s-model.fits'%inputs['input_model'])
 elif part == 1:
 	uvsub(vis='%s.ms'%inputs['prefix'],reverse=True)
-	split(vis='%s.ms%inputs['prefix']',outputvis='%s.ms2'%inputs['prefix'])
+	split(vis='%s.ms'%inputs['prefix'],outputvis='%s.ms2'%inputs['prefix'])
 	os.system('rm -r %s.ms'%inputs['prefix'])
 	os.system('mv %s.ms2 %s.ms'%inputs['prefix'])
