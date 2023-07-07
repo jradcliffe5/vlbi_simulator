@@ -55,6 +55,16 @@ if part == 1:
 
 	## Add noise to measurement sets & flag
 	commands.append('%s %s/simulations/add_noise_hetero.py S %s %s'%(inputs['CASA_exec'],rpath, sys.argv[i], sys.argv[i+1]))
+
+	if inputs['input_model'] != '':
+		if inputs['input_model'].endswith('.fits'):
+			commands.append('cp %s %s-model.fits'%(inputs['input_model'],inputs['input_model'].split('.fits')))
+			modelprefix='%s'%inputs['input_model'].split('.fits')
+		else:
+			commands.append('%s %s/simulations/input_model.py 0 %s' % (inputs['CASA_exec'], rpath, sys.argv[i]))
+			modelprefix='%s'%inputs['input_model']
+		commands.append('%s -predict -name %s %s/%s.ms'%(inputs['wsclean_exec'], modelprefix, inputs['output_path'], inputs['prefix']))
+		commands.append('%s %s/simulations/input_model.py 1 %s' % (inputs['CASA_exec'], rpath, sys.argv[i]))
 	
 	write_job(step=step,commands=commands,job_manager=inputs['job_manager'])
 
@@ -70,7 +80,6 @@ if part == 2:
 
 	if inputs['mosaic'] == "False":
 		commands.append('%s %s/%s-image-pb.fits'%(inputs['rms_exec'],inputs['output_path'],inputs['prefix']))
-			
 	else:
 		commands.append('%s %s/simulations/fit_pb.py %s'%(inputs['CASA_exec'],rpath, sys.argv[i]))
 		commands.append('%s %s/simulations/generate_mosaic_pointings.py %s'%(inputs['CASA_exec'],rpath,sys.argv[i]))

@@ -64,7 +64,7 @@ This simple simulator is designed to allow measurement sets to be created that c
 \subsection{Prerequisites}
 The majority of the work in getting this package installed is the various packages that are required for it to function. As a result, we recommend using \texttt{singularity} as the various packages require some shared environments which can clash with each other. These singularity images are available \href{ss}{here}.
 
-If you decide not to use singularity, or want to build optimised images based on your compute architecture, then the packages you will need are the following:
+If you decide not to use singularity, or want to build optimised images based on your computer architecture, then the packages you will need are the following:
 %
 \begin{itemize}
 	\item \texttt{simms} - \href{https://github.com/ratt-ru/simms}{https://github.com/ratt-ru/simms}. This package is used to generate custom empty measurement sets. YOu can also get this installed as part of the \texttt{stimela} package.
@@ -79,7 +79,7 @@ Installation should be fairly simple and requires just a git clone of this repos
 
 \section{Quick start guide}
 
-The simulator is pretty simple to use and just needs to have the two input file (\texttt{simulator\_inputs.txt} and \texttt{simulator\_advanced\_inputs.txt}) edited to select the array of your choice. You can copy the input files to whatever directory you want as long as they are specified when you run the simulator. The various inputs in this file and descriptions are described in Section~\ref{ss:inputfile}. The simulator comprises three different steps that are controlled by a \texttt{bash} script per step. To make these scripts, we can use the following syntax on the command line,
+The simulator is pretty simple to use and just needs to have the two input files (\texttt{simulator\_inputs.txt} and \texttt{simulator\_advanced\_inputs.txt}) edited to select the array of your choice. You can copy the input files to whatever directory you want as long as they are specified when you run the simulator. The various inputs in this file and descriptions are described in Section~\ref{ss:inputfile}. The simulator comprises three different steps that are controlled by a \texttt{bash} script per step. To make these scripts, we can use the following syntax on the command line,
 %
 \begin{lstlisting}
 	singularity exec <path_to_casa_image> python <path_to_git_repository>/wf_vlbi_simulator.py <path_to_inputs>/simulator_inputs.txt <path_to_inputs>/simulator_advanced_inputs.txt <step_number>
@@ -90,7 +90,7 @@ The step number corresponds to the part of the simulation you want to perform an
 \begin{enumerate}
 	\item \textbf{make ms} - generates a measurement set, inputs noise and optionally imports a model.
 	\item \textbf{single pointing} - s image of a single pointing including primary beam attenuation. If a mosaic is not needed, sensitivity maps are made.
-	\item \textbf{mosaic} - produces measurement sets corresponding to a mosaic defined in the input file. Makes images of each individual measurement set.
+	\item \textbf{mosaic} - produces measurement sets corresponding to a mosaic defined in the input file. Makes images of each measurement set.
 	\item \textbf{make image} - combines the mosaic pointing into a single mosaic and generates sensitivity maps.
 \end{enumerate}
 

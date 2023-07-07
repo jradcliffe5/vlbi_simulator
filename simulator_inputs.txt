@@ -39,19 +39,20 @@ bit_sampling = 2                    # Bit sampling
 bandwidth =                         # Bandwidth in MHz (if set, it will override data_rate)
 npols     = 4                       # Number of polarisations
 obs_freq  = 1.4                     # Central observing frequency (in GHz)
-wide_field_ITRF = True              # Use compact array config to reduce image size needed
+input_model =                       # Give fits or CASA model for input to data (should set wide_field_ITRF=False)
+wide_field_ITRF = True              # Use compact array configuration to reduce image size needed
 
 
 ###-----------------------------###
 ###      Observing scheme       ###
 ###-----------------------------###
-field_centre          = ["12h02m21.69803001s", "70d11m56.50964186s"] # Field centre (pointing centre if mosaic=False otherwise mosaic centre)
-total_time_on_source  = 0.9333                     # Total time on the target source in hours
-time_multiplier       = 1                          # Do ad-hoc multiplication to adjust SEFD to sim time w/o large data
-mosaic                = True                       # Make a mosaic
-mosaic_area           = [2,2]                      # Mosaic area in degrees    
-mosaic_filling_factor = 2.0                        # Filling factor for mosaic (increase if want non-uniform sensitivity)
-custom_mosaic         = custom_mosaic.txt       # Give custom positions (will override area if set)
+field_centre          = ["12h02m21.6s", "70d11m56.5s"] # Field centre (pointing centre if mosaic=False otherwise mosaic centre)
+total_time_on_source  = 0.9333                         # Total time on the target source in hours
+time_multiplier       = 1                              # Do ad-hoc multiplication to adjust SEFD to sim time w/o large data
+mosaic                = True                           # Make a mosaic
+mosaic_area           = [2,2]                          # Mosaic area in degrees    
+mosaic_filling_factor = 1.2                            # Filling factor for mosaic (increase if want non-uniform sensitivity)
+custom_mosaic         = custom_mosaic.txt              # Give custom positions (will override area if set)
 
 ###-----------------###
 ###     Imaging     ###
