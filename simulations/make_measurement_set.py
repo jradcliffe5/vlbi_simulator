@@ -54,7 +54,7 @@ else:
 	tos = float(inputs['total_time_on_source'])
 
 ## If making very wide-field images, we simply use vla-c array positions so we don't need to make massive images.
-if str(inputs['wide_field_ITRF']) == 'True':
+if str(inputs['wf_ITRF']) == 'True':
 	itrf="%s/vlapos_sims.itrf"%output
 else:
 	itrf="%s/sims.itrf"%output

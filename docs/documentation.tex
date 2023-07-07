@@ -23,6 +23,9 @@
 \usepackage{fancyhdr}
 \usepackage{multibib}
 \usepackage{listings}
+\usepackage{longtable}
+\usepackage{amsmath, amssymb}
+
 \lstset{
 basicstyle=\small\ttfamily,
 columns=flexible,
@@ -41,14 +44,16 @@ breaklines=true
 \fancyhf{}
 \fancyhead[LE,LO]{\fontfamily{lmss}\selectfont Dr. Jack F. Radcliffe}
 \fancyhead[RE,RO]{\fontfamily{lmss}\selectfont VLBI simulator documentation}
-\fancyfoot[CE,CO]{\fontfamily{lmss}\selectfont\thepage}
+\fancyfoot[RE,RO]{\fontfamily{lmss}\selectfont\thepage}
+\fancyfoot[LE,LO]{\fontfamily{lmss}\selectfont Last updated - \today}
 
 \fancypagestyle{coverstyle}{\renewcommand{\headrulewidth}{0pt}\fancyhf{}
-\fancyfoot[CE,CO]{\fontfamily{lmss}\selectfont\thepage}}
+\fancyfoot[RE,RO]{\fontfamily{lmss}\selectfont\thepage}
+\fancyfoot[LE,LO]{\fontfamily{lmss}\selectfont Last updated - \today}}
 
 \setlength{\droptitle}{-2em}   % This is your set screw
 
-\title{\fontfamily{lmss}\selectfont Simple VLBI simulator documentation\vspace{-1em}}
+\title{\fontfamily{lmss}\selectfont VLBI simulator documentation\vspace{-1em}}
 \date{\vspace{-3.5em}}
 \author{\fontfamily{lmss}\selectfont Dr. Jack F. Radcliffe\vspace{-2em}}
 
@@ -64,7 +69,7 @@ This simple simulator is designed to allow measurement sets to be created that c
 \subsection{Prerequisites}
 The majority of the work in getting this package installed is the various packages that are required for it to function. As a result, we recommend using \texttt{singularity} as the various packages require some shared environments which can clash with each other. These singularity images are available \href{ss}{here}.
 
-If you decide not to use singularity, or want to build optimised images based on your computer architecture, then the packages you will need are the following:
+If you decide not to use singularity or want to build optimised images based on your computer architecture, then the packages you will need are the following:
 %
 \begin{itemize}
 	\item \texttt{simms} - \href{https://github.com/ratt-ru/simms}{https://github.com/ratt-ru/simms}. This package is used to generate custom empty measurement sets. YOu can also get this installed as part of the \texttt{stimela} package.
@@ -82,7 +87,7 @@ Installation should be fairly simple and requires just a git clone of this repos
 The simulator is pretty simple to use and just needs to have the two input files (\texttt{simulator\_inputs.txt} and \texttt{simulator\_advanced\_inputs.txt}) edited to select the array of your choice. You can copy the input files to whatever directory you want as long as they are specified when you run the simulator. The various inputs in this file and descriptions are described in Section~\ref{ss:inputfile}. The simulator comprises three different steps that are controlled by a \texttt{bash} script per step. To make these scripts, we can use the following syntax on the command line,
 %
 \begin{lstlisting}
-	singularity exec <path_to_casa_image> python <path_to_git_repository>/wf_vlbi_simulator.py <path_to_inputs>/simulator_inputs.txt <path_to_inputs>/simulator_advanced_inputs.txt <step_number>
+	singularity exec <path_to_casa_image> python <path_to_git_repository>/vlbi_simulator.py <path_to_inputs>/simulator_inputs.txt <path_to_inputs>/simulator_advanced_inputs.txt <step_number>
 \end{lstlisting}
 %
 The step number corresponds to the part of the simulation you want to perform and the number corresponds to the following,
@@ -100,12 +105,12 @@ The simulator takes two input files, the \texttt{simulator\_inputs.txt} file, wh
 
 \subsubsection{Software and paths}
 \begin{itemize}
-	\item \texttt{CASA\_exec}, \texttt{wsclean\_exec}, \texttt{stimela\_exec}, and \texttt{rms\_exec} - the full executable commands on how to open CASA, wsclean, stimela/simms and the rms-finding software. These must be the full command i.e., if you are using singularity then the CASA command in the input file may look something like,
+	\item \texttt{CASA\_exec}, \texttt{wsclean\_exec}, \texttt{stimela\_exec}, and \texttt{rms\_exec} - the full executable commands on how to open CASA, wsclean and stimela/simms. These must be the full command i.e., if you are using singularity then the CASA command in the input file may look something like,
 	\begin{lstlisting}
 	CASA_exec = singularity exec /idia/software/containers/casa-6.3.simg python
 	\end{lstlisting}
 	\item \texttt{output\_path} - set this to put all outputs into this folder
-	\item \texttt{repo\_path} - path to the github repository and must include the \texttt{wf\_vlbi\_simulator} part.
+	\item \texttt{repo\_path} - path to the github repository and must include the \texttt{vlbi\_simulator} part.
 	\item \texttt{prefix} - string to append to the start of all output file names. Will be set the `sim' is left empty.
 \end{itemize}
 
@@ -114,7 +119,7 @@ The simulator takes two input files, the \texttt{simulator\_inputs.txt} file, wh
 The simulator is designed to be usable on both your local computer and any high-performance computing architecture which uses Slurm or PBS Pro as its job manager. For the following inputs, leaving a parameter blank means that the parameter will not be specified to the job manager (and may be set as the default value on the cluster).
 %
 \begin{itemize}
-	\item \texttt{job\_manager} - defines the job manager software (options are \texttt{slurm} or \texttt{pbspro}). If this is set to \texttt{bash} then the codes can be run on your local machine.
+	\item \texttt{job\_manager} - defines the job manager software (options are \texttt{slurm} or \texttt{pbspro}). If this is set to \texttt{bash} then the codes can be run on your local machine. You can also ignore the rest of these inputs if using \texttt{bash}.
 	\item \texttt{partition} - selects the partition of the cluster to use.
 	\item \texttt{walltime} - maximum time requested on the cluster to run the job.
 	\item \texttt{nodes} - number of nodes requested.
@@ -122,19 +127,65 @@ The simulator is designed to be usable on both your local computer and any high-
 	\item \texttt{mpiprocs} - number of tasks per node (normally good to set to the same as the number of CPUs).
 	\item \texttt{nodetype} - defines the type of node to use (not used in Slurm)
 	\item \texttt{max\_jobs} - for the steps that use multiple jobs (e.g., the mosaic step), this specifies the maximum number of jobs to be submitted at once. Setting this to \texttt{-1} means that there is no maximum limit.
+	\item \texttt{mem} - defines the maximum RAM requested to the node (suffix determines the order of magnitude e.g., \texttt{50G} requested 50 gigabytes)
+	\item \texttt{email\_progress} - determines which email the progress notice will be sent to.
+\end{itemize}
+
+\subsubsection{Array and data set up}
+
+These inputs determine the data structure of the measurement set and include support for data rates as well as the selection of bandwidths. The inputs are as follows,
+%
+\begin{itemize}
+	\item \texttt{antennae} - python list of antennae to be included. The antenna codes currently follow the EVN calculator\footnote{\deff \href{http://old.evlbi.org/cgi-bin/EVNcalc}{http://old.evlbi.org/cgi-bin/EVNcalc}} names. The currently supported antennae and their parameters can be found in Appendix~\ref{a:supported_antennae} and the data are located in the \texttt{master.itrf} and \texttt{ant\_info.json} files. 
+	\item \texttt{data\_rate} - the data rate of the observation in $\mathrm{Mbit\,s^{-1}}$ that is related to the bandwidth ($\Delta\nu$), bit sampling ($N_\mathrm{bit}$) and polarisations ($N_\mathrm{pols}$) by $\text{data rate} = \Delta\nu \cdot N_\mathrm{pols} \cdot N_\mathrm{bit}\cdot 2$. 
+	\item \texttt{bit\_sampling} - determines the bit sampling as used in the data rate calculation.
+	\item \texttt{bandwidth} - directly input a pre-determined bandwidth in MHz. If this is set, then the \texttt{data\_rate} parameter will be ignored!
+	\item \texttt{npols} - number of polarisation products in the MS. Note that $N_\mathrm{pols}$ in the data-rate equation will equal 2 regardless of whether cross or/and parallel hands are present.
+	\item \texttt{obs\_freq} - central observing frequency in GHz.
+	\item \texttt{input\_model} - sky model file that is to be gridded into the visibilities. Model should be either in a FITS or CASA image format and should be in units of Jy per pixel. If this parameter is left empty, then no model will be inputted.
+	\item \texttt{wf\_ITRF} - if True, the simulated measurement set will use a VLA B-array position instead of the VLBI geodetic coordinates. Useful for doing rms maps but not for modelling the effect of spatial filtering.
+\end{itemize}
+
+\subsubsection{Observing scheme}
+
+These parameters specify how you want your observing scheme to be. It supports a single source and single pointing as well as an optimal mosaic which is determined from the primary beam size.
+%
+\begin{itemize}
+	\item \texttt{field\_centre}   
+	\item \texttt{total\_time\_on\_source} 
+	\item \texttt{time\_multiplier}  
+	\item \texttt{mosaic}                                   
+	\item \texttt{mosaic\_area}              
+	\item \texttt{mosaic\_filling\_factor}
+	\item \texttt{custom\_mosaic} 
+	%  compact array configuration to reduce image size needed
 \end{itemize}
 
 \textbf{documentation in progress}
-%HPC_project_code  =  
-%partition         =  GPUV100
-%walltime          =  10:00:00
-%nodes             =     1
-%cpus              =    24
-%mpiprocs          =    24
-%nodetype          =  haswell_reg
-%max_jobs          =    -1
-%mem = 50G
-%email_progress    =  jack.f.radcliffe@gmail.com
+% ###-----------------------------###
+% ###      Observing scheme       ###
+% ###-----------------------------###
+% field_centre          = ["12h02m21.6s", "70d11m56.5s"] # Field centre (pointing centre if mosaic=False otherwise mosaic centre)
+% total_time_on_source  = 0.9333                         # Total time on the target source in hours
+% time_multiplier       = 1                              # Do ad-hoc multiplication to adjust SEFD to sim time w/o large data
+% mosaic                = True                           # Make a mosaic
+% mosaic_area           = [2,2]                          # Mosaic area in degrees    
+% mosaic_filling_factor = 1.2                            # Filling factor for mosaic (increase if want non-uniform sensitivity)
+% custom_mosaic         =                                # Give custom positions (will override area if set)
+%  compact array configuration to reduce image size needed
 
+\appendix
+
+\section{Supported antennae and properties}\label{a:supported_antennae}
+
+\begin{longtable}{cccccccc}
+	\toprule
+	\textbf{Antenna} & \textbf{Code} & \textbf{Bands} & \multicolumn{3}{c}{\textbf{Geodetic coordinates}} & \textbf{SEFD} & $\boldsymbol{D}_\mathrm{eff}$\\
+	& & & $x$ & $y$ & $z$ & & \\
+	& & & (m) & (m) & (m) & (Jy) & (m) \\
+	\hline\endhead
+	Effelsberg & Ef & L, C & 4033947.1955 & 486990.8687 & 4900431.0438 & 19, 20 & 76 \\
+\end{longtable}
+\textbf{Need to finish this table}
 
 \end{document}
