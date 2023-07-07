@@ -10,7 +10,7 @@ try:
 except:
 	i = 1
 	pass
-part = int(sys.argv[0])
+part = int(sys.argv[i])
 inputs = headless(sys.argv[i+1])
 
 if part == 0:
