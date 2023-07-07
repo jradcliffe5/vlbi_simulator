@@ -507,7 +507,7 @@ print('Match antennae to sefds')
 sefd_ants, diams_ants = match_to_antenna_nos(evn_SEFD[band],ms)
 
 print('Add simple noise')
-add_noise(msfile=ms,datacolumn='DATA',evn_SEFD=sefd_ants,adjust_time=adjust_time)
+add_noise(msfile=ms,datacolumn='CORRECTED_DATA',evn_SEFD=sefd_ants,adjust_time=adjust_time)
 
 print('Making image')
 rmdirs(glob.glob('%s_IM.*'%ms.split('.ms')[0]))

@@ -64,6 +64,7 @@ if part == 1:
 			modelprefix='%s'%inputs['input_model']
 		commands.append('%s -predict -name %s %s/%s.ms'%(inputs['wsclean_exec'], modelprefix, inputs['output_path'], inputs['prefix']))
 		commands.append('%s %s/simulations/input_model.py 1 %s' % (inputs['CASA_exec'], rpath, sys.argv[i]))
+	commands.append('%s %s/simulations/input_model.py 2 %s' % (inputs['CASA_exec'], rpath, sys.argv[i]))
 	
 	write_job(step=step,commands=commands,job_manager=inputs['job_manager'])
 
