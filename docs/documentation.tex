@@ -88,7 +88,8 @@ The simulator is pretty simple to use and just needs to have the two input file 
 The step number corresponds to the part of the simulation you want to perform and the number corresponds to the following,
 %
 \begin{enumerate}
-	\item \textbf{single pointing} - generates a measurement set, inputs noise and makes image of a single pointing including primary beam attenuation. If a mosaic is not needed, sensitivity maps are made.
+	\item \textbf{make ms} - generates a measurement set, inputs noise and optionally imports a model.
+	\item \textbf{single pointing} - s image of a single pointing including primary beam attenuation. If a mosaic is not needed, sensitivity maps are made.
 	\item \textbf{mosaic} - produces measurement sets corresponding to a mosaic defined in the input file. Makes images of each individual measurement set.
 	\item \textbf{make image} - combines the mosaic pointing into a single mosaic and generates sensitivity maps.
 \end{enumerate}
