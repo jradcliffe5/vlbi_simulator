@@ -18,5 +18,5 @@ if part == 0:
 elif part == 1:
 	uvsub(vis='%s.ms'%inputs['prefix'],reverse=True)
 	split(vis='%s.ms'%inputs['prefix'],outputvis='%s.ms2'%inputs['prefix'])
-	os.system('rm -r %s.ms'%inputs['prefix'])
-	os.system('mv %s.ms2 %s.ms'%inputs['prefix'])
+	os.system('rm -r %s.ms'%(inputs['prefix'],inputs['prefix']))
+	os.system('mv %s.ms2 %s.ms'%(inputs['prefix'],inputs['prefix']))
