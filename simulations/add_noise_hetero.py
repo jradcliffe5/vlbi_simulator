@@ -70,8 +70,8 @@ def add_noise(msfile,datacolumn,evn_SEFD,adjust_time=1.0):
 	print(chan_width,tint)
 	tb.close()
 	for i in range(len(antenna1)):
-		sefd = calc_sefd(evn_SEFD[antenna1[i]],evn_SEFD[antenna2[i]],tint,chan_width,0.88)
-		amps = np.random.normal(0.,sefd,np.shape(data[:,:,i]))
+		sefd = calc_sefd(evn_SEFD[antenna1[i]],evn_SEFD[antenna2[i]],tint,chan_width,0.7)
+		amps = np.abs(np.random.normal(0.,sefd,np.shape(data[:,:,i])))
 		phase = ((np.pi+np.pi)*np.random.random_sample(np.shape(data[:,:,i])))-np.pi
 		data[:,:,i]=P2R(amps,phase)
 		weights[:,i] = np.ones(weights[:,i].shape)/(sefd**2)

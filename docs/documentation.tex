@@ -177,6 +177,20 @@ These parameters specify how you want your observing scheme to be. It supports a
 	\item \texttt{clean\_rms} - makes a clean rms map rather than an rms map produced using box-car smoothing of the map.
 \end{itemize}
 
+\section{Simulating VLBI arrays}
+
+FLOW CHART
+
+SEFDs
+%(1./(float(sampeff)))*(sefd_a)*(1./(np.sqrt(tint*dnu)))
+\begin{equation}
+	\mathrm{\sigma}_{ij} = \frac{1}{\eta_\mathrm{VLBI}}\left(\frac{\mathrm{SEFD}_{ij}}{\sqrt{t_\mathrm{int}\delta\nu}}\right)
+\end{equation}
+where, 
+\begin{equation}
+	\mathrm{SEFD}_{ij} = \frac{1}{{\sqrt{\frac{1}{\mathrm{SEFD}_i}\times\frac{1}{\mathrm{SEFD}_j}}}}
+\end{equation}
+
 \appendix
 
 \section{Supported antennae and properties}\label{a:supported_antennae}
