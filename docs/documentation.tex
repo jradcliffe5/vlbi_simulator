@@ -84,7 +84,7 @@ Installation should be fairly simple and requires just a git clone of this repos
 
 \section{Quick start guide}
 
-The simulator is pretty simple to use and just needs to have the two input files (\texttt{simulator\_inputs.txt} and \texttt{simulator\_advanced\_inputs.txt}) edited to select the array of your choice. You can copy the input files to whatever directory you want as long as they are specified when you run the simulator. The various inputs in this file and descriptions are described in Section~\ref{ss:inputfile}. The simulator comprises three different steps that are controlled by a \texttt{bash} script per step. To make these scripts, we can use the following syntax on the command line,
+The simulator is pretty simple to use and just needs to have the two input files (\texttt{simulator\_inputs.txt} and \texttt{simulator\_advanced\_inputs.txt}) edited to select the array of your choice. You can copy the input files to whatever directory you want as long as they are specified when you run the simulator script to produce the job files. The various inputs in this file and descriptions are described in Section~\ref{ss:inputfile}. The simulator comprises three different steps that are controlled by a \texttt{bash} script per step. To make these scripts, we can use the following syntax on the command line,
 %
 \begin{lstlisting}
 	singularity exec <path_to_casa_image> python <path_to_git_repository>/vlbi_simulator.py <path_to_inputs>/simulator_inputs.txt <path_to_inputs>/simulator_advanced_inputs.txt <step_number>
@@ -98,12 +98,20 @@ The step number corresponds to the part of the simulation you want to perform an
 	\item \textbf{mosaic} - produces measurement sets corresponding to a mosaic defined in the input file. Makes images of each measurement set.
 	\item \textbf{make image} - combines the mosaic pointing into a single mosaic and generates sensitivity maps.
 \end{enumerate}
+%
+Once this script is run, then it will make a file in your current folder called \texttt{job\_<step\_name>.<job\_manager>}. You then want to run this via the job submission command. For example, if you are running \texttt{make\_ms} using Slurm, then you would type the following to run the script,
+%
+\begin{lstlisting}
+	sbatch job_make_ms.slurm
+\end{lstlisting}
+%
+After this has been completed, then you can run the next step to make the job script that will be submitted to your job manager and submit that. If you just want to generate a measurement set and include a model.
 
-\subsection{Input files}\label{ss:inputfile}
+\section{Input files}\label{ss:inputfile}
 
 The simulator takes two input files, the \texttt{simulator\_inputs.txt} file, which you will need to edit, while the \texttt{simulator\_advanced\_inputs.txt} file is probably ok being left as default (unless you want to make exact, large data size measurement sets). The \texttt{simulator\_inputs.txt} file comprises a range of parameters that you need to set and the following subsections will describe these.
 
-\subsubsection{Software and paths}
+\subsection{Software and paths}
 \begin{itemize}
 	\item \texttt{CASA\_exec}, \texttt{wsclean\_exec}, \texttt{stimela\_exec}, and \texttt{rms\_exec} - the full executable commands on how to open CASA, wsclean and stimela/simms. These must be the full command i.e., if you are using singularity then the CASA command in the input file may look something like,
 	\begin{lstlisting}
@@ -114,7 +122,7 @@ The simulator takes two input files, the \texttt{simulator\_inputs.txt} file, wh
 	\item \texttt{prefix} - string to append to the start of all output file names. Will be set the `sim' is left empty.
 \end{itemize}
 
-\subsubsection{HPC options}
+\subsection{HPC options}
 
 The simulator is designed to be usable on both your local computer and any high-performance computing architecture which uses Slurm or PBS Pro as its job manager. For the following inputs, leaving a parameter blank means that the parameter will not be specified to the job manager (and may be set as the default value on the cluster).
 %
@@ -131,7 +139,7 @@ The simulator is designed to be usable on both your local computer and any high-
 	\item \texttt{email\_progress} - determines which email the progress notice will be sent to.
 \end{itemize}
 
-\subsubsection{Array and data set up}
+\subsection{Array and data set up}
 
 These inputs determine the data structure of the measurement set and include support for data rates as well as the selection of bandwidths. The inputs are as follows,
 %
@@ -151,28 +159,23 @@ These inputs determine the data structure of the measurement set and include sup
 These parameters specify how you want your observing scheme to be. It supports a single source and single pointing as well as an optimal mosaic which is determined from the primary beam size.
 %
 \begin{itemize}
-	\item \texttt{field\_centre}   
-	\item \texttt{total\_time\_on\_source} 
-	\item \texttt{time\_multiplier}  
-	\item \texttt{mosaic}                                   
-	\item \texttt{mosaic\_area}              
-	\item \texttt{mosaic\_filling\_factor}
-	\item \texttt{custom\_mosaic} 
+	\item \texttt{field\_centre} - determines the central pointing location or mosaic and should be a two-element list with RA and Dec (e.g., \texttt{["12h02m21.6s", "70d11m56.5s"]}). The coordinates should be for the J2000 epoch.
+	\item \texttt{total\_time\_on\_source} - total integration time on source in hours. If this is a mosaic, then the time per pointing will be this value divided by the number of pointings.
+	\item \texttt{time\_multiplier} - A method of approximating large hour integrations through hour-angle averaging. If this is set >1 then the \texttt{total\_time\_on\_source} is multiplied by this value but the data-size remains the same.
+	\item \texttt{mosaic} - if set to True, then a mosaic is assumed to be the desired outcome.                             
+	\item \texttt{mosaic\_area} - two element list with the size of the mosaic sides in degrees. This will assume to be centred on the \texttt{field\_centre}.         
+	\item \texttt{mosaic\_filling\_factor} - for a purely Gaussian beam, the optimal value for this parameter is 1.2. Lower values will cause the mosaic to be oversampled and vice-versa. 
+	\item \texttt{custom\_mosaic} - if this is set, then it needs to define a text file that contains the positions of the mosaics. Each line of this file needs to specify the RA and Dec separated by a space (e.g., \texttt{12h00m00s 70d00m00s})
 	%  compact array configuration to reduce image size needed
 \end{itemize}
 
-\textbf{documentation in progress}
-% ###-----------------------------###
-% ###      Observing scheme       ###
-% ###-----------------------------###
-% field_centre          = ["12h02m21.6s", "70d11m56.5s"] # Field centre (pointing centre if mosaic=False otherwise mosaic centre)
-% total_time_on_source  = 0.9333                         # Total time on the target source in hours
-% time_multiplier       = 1                              # Do ad-hoc multiplication to adjust SEFD to sim time w/o large data
-% mosaic                = True                           # Make a mosaic
-% mosaic_area           = [2,2]                          # Mosaic area in degrees    
-% mosaic_filling_factor = 1.2                            # Filling factor for mosaic (increase if want non-uniform sensitivity)
-% custom_mosaic         =                                # Give custom positions (will override area if set)
-%  compact array configuration to reduce image size needed
+\subsection{Imaging}
+%
+\begin{itemize}
+	\item\texttt{size} - size of the image in pixels. If a quantity is defined then then the cell size will be automatically determined.
+	\item \texttt{cell} - angular size of each pixel. If you have set \texttt{wf\_itrf = True} then this value should be set to around 1.5arcsec as a VLA B-array configuration is used.
+	\item \texttt{clean\_rms} - makes a clean rms map rather than an rms map produced using box-car smoothing of the map.
+\end{itemize}
 
 \appendix
 
