@@ -48,8 +48,6 @@ def calc_sefd(sefd1,sefd2,tint,dnu,sampeff):
 
 def add_noise(msfile,datacolumn,evn_SEFD,adjust_time=1.0):
 	tb = casatools.table()
-	qa = casatools.quanta()
-	me = casatools.measures()
 	tb.open('%s'%msfile, nomodify=True)
 	data = tb.getcol('%s'%datacolumn)
 	if datacolumn == 'CORRECTED_DATA':

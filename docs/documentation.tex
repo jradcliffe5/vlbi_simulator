@@ -150,7 +150,7 @@ These inputs determine the data structure of the measurement set and include sup
 	\item \texttt{bandwidth} - directly input a pre-determined bandwidth in MHz. If this is set, then the \texttt{data\_rate} parameter will be ignored!
 	\item \texttt{npols} - number of polarisation products in the MS. Note that $N_\mathrm{pols}$ in the data-rate equation will equal 2 regardless of whether cross or/and parallel hands are present.
 	\item \texttt{obs\_freq} - central observing frequency in GHz.
-	\item \texttt{input\_model} - sky model file that is to be gridded into the visibilities. Model should be either in a FITS or CASA image format and should be in units of Jy per pixel. If this parameter is left empty, then no model will be inputted.
+	\item \texttt{input\_model} - sky model file that is to be gridded into the visibilities. The model should be either in a FITS or CASA image format and should be in units of Jy per pixel. If this parameter is left empty, then no model will be inputted.
 	\item \texttt{wf\_ITRF} - if True, the simulated measurement set will use a VLA B-array position instead of the VLBI geodetic coordinates. Useful for doing rms maps but not for modelling the effect of spatial filtering.
 \end{itemize}
 
@@ -160,8 +160,8 @@ These parameters specify how you want your observing scheme to be. It supports a
 %
 \begin{itemize}
 	\item \texttt{field\_centre} - determines the central pointing location or mosaic and should be a two-element list with RA and Dec (e.g., \texttt{["12h02m21.6s", "70d11m56.5s"]}). The coordinates should be for the J2000 epoch.
-	\item \texttt{total\_time\_on\_source} - total integration time on source in hours. If this is a mosaic, then the time per pointing will be this value divided by the number of pointings.
-	\item \texttt{time\_multiplier} - A method of approximating large hour integrations through hour-angle averaging. If this is set >1 then the \texttt{total\_time\_on\_source} is multiplied by this value but the data-size remains the same.
+	\item \texttt{total\_time\_on\_source} - total integration time on the source in hours. If this is a mosaic, then the time per pointing will be this value divided by the number of pointings.
+	\item \texttt{time\_multiplier} - A method of approximating large hour integrations through hour-angle averaging. If this is set >1 then the \texttt{total\_time\_on\_source} is multiplied by this value but the data size remains the same.
 	\item \texttt{mosaic} - if set to True, then a mosaic is assumed to be the desired outcome.                             
 	\item \texttt{mosaic\_area} - two element list with the size of the mosaic sides in degrees. This will assume to be centred on the \texttt{field\_centre}.         
 	\item \texttt{mosaic\_filling\_factor} - for a purely Gaussian beam, the optimal value for this parameter is 1.2. Lower values will cause the mosaic to be oversampled and vice-versa. 
@@ -172,7 +172,7 @@ These parameters specify how you want your observing scheme to be. It supports a
 \subsection{Imaging}
 %
 \begin{itemize}
-	\item\texttt{size} - size of the image in pixels. If a quantity is defined then then the cell size will be automatically determined.
+	\item\texttt{size} - the size of the image in pixels. If a quantity is defined then then the cell size will be automatically determined.
 	\item \texttt{cell} - angular size of each pixel. If you have set \texttt{wf\_itrf = True} then this value should be set to around 1.5arcsec as a VLA B-array configuration is used.
 	\item \texttt{clean\_rms} - makes a clean rms map rather than an rms map produced using box-car smoothing of the map.
 \end{itemize}
