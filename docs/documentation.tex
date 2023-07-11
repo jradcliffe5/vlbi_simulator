@@ -177,26 +177,49 @@ These parameters specify how you want your observing scheme to be. It supports a
 	\item \texttt{clean\_rms} - makes a clean rms map rather than an rms map produced using box-car smoothing of the map.
 \end{itemize}
 
-\section{How the simulator works}
+\subsection{Advanced inputs}
 
-FLOW CHART
-
-SEFDs
-%(1./(float(sampeff)))*(sefd_a)*(1./(np.sqrt(tint*dnu)))
-\begin{equation}
-	\mathrm{\sigma}_{ij} = \frac{1}{\eta_\mathrm{VLBI}}\left(\frac{\mathrm{SEFD}_{ij}}{\sqrt{t_\mathrm{int}\delta\nu}}\right)
-\end{equation}
-where, 
-\begin{equation}
-	\mathrm{SEFD}_{ij} = \frac{1}{{\sqrt{\frac{1}{\mathrm{SEFD}_i}\times\frac{1}{\mathrm{SEFD}_j}}}}
-\end{equation}
+The file \texttt{simulator\_advanced\_inputs.txt} contains some more variables which you can use to fine-tune the simulation. For the moment, these are quite simple and are aimed at controlling the output measurement set size through integration time and channelisation. As of version 1 of the simulator, the advanced inputs contain the following,
 %
-Inputted into data as,
-%
-\begin{equation}
-	\rho(|\mathsf{V}_{ij}|) =\left|\frac{1}{\sqrt{2 \pi \sigma_{ij}^{2}}} \exp\left(-\frac{|\mathsf{V}_{ij}|^{2}}{2\sigma_{ij}^{2}}\right)\right|,
-\end{equation}
+\begin{itemize}
+	\item\texttt{nchan} - Number of channels in the entire bandwidth
+	\item\texttt{int\_time} - Integration time in seconds
+	\item\texttt{time\_start} - the start time of the observation (in the format \texttt{21 Sep 2022})
+\end{itemize}
 
+% \section{How the simulator works}
+
+% FLOW CHART
+
+% SEFDs
+% %(1./(float(sampeff)))*(sefd_a)*(1./(np.sqrt(tint*dnu)))
+% \begin{equation}
+% 	\mathrm{\sigma}_{ij} = \frac{1}{\eta_\mathrm{VLBI}}\left(\frac{\mathrm{SEFD}_{ij}}{\sqrt{t_\mathrm{int}\delta\nu}}\right)
+% \end{equation}
+% where, 
+% \begin{equation}
+% 	\mathrm{SEFD}_{ij} = \frac{1}{{\sqrt{\frac{1}{\mathrm{SEFD}_i}\times\frac{1}{\mathrm{SEFD}_j}}}}
+% \end{equation}
+% %
+% Inputted into data as,
+% %
+% \begin{equation}
+% 	\rho(|\mathsf{V}_{ij}|) =\left|\frac{1}{\sqrt{2 \pi \sigma_{ij}^{2}}} \exp\left(-\frac{|\mathsf{V}_{ij}|^{2}}{2\sigma_{ij}^{2}}\right)\right|,
+% \end{equation}
+
+\section{Future developments}
+
+The following table outlines the various features that we would like to incorporate into the simulation in the future:
+%
+\begin{longtable}{p{0.2\linewidth}p{0.5\linewidth}p{0.2\linewidth}}
+	\toprule
+	\textbf{Feature} & \textbf{Description} & \textbf{Progress} \\
+	\hline\endhead
+	Multiple spectral windows & Measurement sets need to include multiple spectral windows. &  Investigating bug in simms \\
+	Optimised observing times & Option to optimally select hour angle to have maximum source visibility & \\
+	Antenna instrumental corruptions & & \\
+	\bottomrule
+\end{longtable}
 \appendix
 
 \section{Supported antennae and properties}\label{a:supported_antennae}
@@ -208,6 +231,7 @@ Inputted into data as,
 	& & & (m) & (m) & (m) & (Jy) & (m) \\
 	\hline\endhead
 	Effelsberg & Ef & L, C & 4033947.1955 & 486990.8687 & 4900431.0438 & 19, 20 & 76 \\
+	\bottomrule
 \end{longtable}
 \textbf{Need to finish this table}
 
