@@ -35,7 +35,7 @@ breaklines=true
 \newcommand{\deff}{\fontfamily{lmss}\selectfont}
 \renewcommand{\footrulewidth}{0.4pt}
 \captionsetup{labelfont={bf,footnotesize},textfont=footnotesize,labelsep=quad,font=sf}
-
+\renewcommand{\theequation}{{\deff\arabic{equation}}}
 \pagestyle{fancy}
 \fancyhf{}
 
@@ -67,15 +67,15 @@ This simple simulator is designed to allow measurement sets to be created that c
 
 \section{Installation instructions}
 \subsection{Prerequisites}
-The majority of the work in getting this package installed is the various packages that are required for it to function. As a result, we recommend using \texttt{singularity} as the various packages require some shared environments which can clash with each other. These singularity images are available \href{ss}{here}.
+The majority of the work in getting this package installed is the various packages that are required for it to function. As a result, we recommend using \texttt{singularity} as the various packages require some shared environments which can clash with each other. These singularity images are available \href[pdfnewwindow=true]{https://drive.google.com/drive/folders/1JkPO8_MSn_zA3QR5GKjj78SSfJeHxVH5?usp=sharing}{here}.
 
 If you decide not to use singularity or want to build optimised images based on your computer architecture, then the packages you will need are the following:
 %
 \begin{itemize}
-	\item \texttt{simms} - \href{https://github.com/ratt-ru/simms}{https://github.com/ratt-ru/simms}. This package is used to generate custom empty measurement sets. YOu can also get this installed as part of the \texttt{stimela} package.
-	\item \texttt{CASA} - \href{https://casa.nrao.edu}{https://casa.nrao.edu}. We recommend the modular version of CASA as you have more control over the packages that are installed with pip. 
+	\item \texttt{simms} - \href[pdfnewwindow=true]{https://github.com/ratt-ru/simms}{https://github.com/ratt-ru/simms}. This package is used to generate custom empty measurement sets. YOu can also get this installed as part of the \texttt{stimela} package.
+	\item \texttt{CASA} - \href[pdfnewwindow=true]{https://casa.nrao.edu}{https://casa.nrao.edu}. We recommend the modular version of CASA as you have more control over the packages that are installed with pip. 
 	\item \texttt{python v3.10+} - you will need the \texttt{pandas}, \texttt{astropy}, \texttt{numpy}, \texttt{scipy} and \texttt{matplotlib} packages which you can install using \texttt{pip} or \texttt{conda} (depending on how you installed python).
-	\item \texttt{wsclean} with the \texttt{Image Domain Gridder} - \href{https://wsclean.readthedocs.io/en/latest/}{https://wsclean.readthedocs.io/en/latest/}. This is required if you are needing to simulate the primary beam effects and other direction-dependent effects. 
+	\item \texttt{wsclean} with the \texttt{Image Domain Gridder} - \href[pdfnewwindow=true]{https://wsclean.readthedocs.io/en/latest/}{https://wsclean.readthedocs.io/en/latest/}. This is required if you are needing to simulate the primary beam effects and other direction-dependent effects. 
 \end{itemize}
 
 \subsection{Installation}
@@ -154,7 +154,7 @@ These inputs determine the data structure of the measurement set and include sup
 	\item \texttt{wf\_ITRF} - if True, the simulated measurement set will use a VLA B-array position instead of the VLBI geodetic coordinates. Useful for doing rms maps but not for modelling the effect of spatial filtering.
 \end{itemize}
 
-\subsubsection{Observing scheme}
+\subsection{Observing scheme}
 
 These parameters specify how you want your observing scheme to be. It supports a single source and single pointing as well as an optimal mosaic which is determined from the primary beam size.
 %
@@ -177,7 +177,7 @@ These parameters specify how you want your observing scheme to be. It supports a
 	\item \texttt{clean\_rms} - makes a clean rms map rather than an rms map produced using box-car smoothing of the map.
 \end{itemize}
 
-\section{Simulating VLBI arrays}
+\section{How the simulator works}
 
 FLOW CHART
 
@@ -189,6 +189,12 @@ SEFDs
 where, 
 \begin{equation}
 	\mathrm{SEFD}_{ij} = \frac{1}{{\sqrt{\frac{1}{\mathrm{SEFD}_i}\times\frac{1}{\mathrm{SEFD}_j}}}}
+\end{equation}
+%
+Inputted into data as,
+%
+\begin{equation}
+	\rho(|\mathsf{V}_{ij}|) =\left|\frac{1}{\sqrt{2 \pi \sigma_{ij}^{2}}} \exp\left(-\frac{|\mathsf{V}_{ij}|^{2}}{2\sigma_{ij}^{2}}\right)\right|,
 \end{equation}
 
 \appendix
