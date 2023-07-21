@@ -4,6 +4,39 @@ import numpy as np
 from datetime import datetime, timedelta
 from simulator_functions import headless, rmdirs, rmfiles
 import sys
+def find_nearest(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return array[idx]
+
+def find_frequencies(obs_freq):
+	freq_c = {"92cm":0.325861,
+	   "49cm":0.611821,
+	   "UHF":1.0,
+	   "21cm":1.427583,
+	   "18cm":1.665513,
+	   "13cm":2.306096,
+	   "6cm":4.996541,
+	   "5cm":5.99584916,
+	   "4cm":7.49481145,
+	   "2cm":14.9896229,
+	   "13mm":23.060958,
+	   "9mm":33.310273,
+	   "7mm":42.827494,
+	   "3mm":99.930819,
+	   "2mm":149.896229}
+	try:
+		obs_freq=float(obs_freq) ## try to see if obs frequency is a float
+		val = find_nearest(freq_c.values(),obs_freq)
+		sefd_key=freq_c.values().index(val)
+	except:
+		try:
+			sefd_key = obs_freq
+			obs_freq=freq_c[obs_freq]
+		except:
+			print('Observing frequency incorrect')
+			sys.exit()
+	return sefd_key, obs_freq
 
 try:
 	i = sys.argv.index("-c") + 2
@@ -26,6 +59,8 @@ except:
 data_rate = float(inputs['data_rate'])
 npols = float(inputs['npols'])
 bits = float(inputs['bit_sampling'])
+sefdkey, obs_freq = find_frequencies(inputs['obs_freq'])
+print(sefdkey,obs_freq)
 if npols >=2.:
 	pols = 2.
 	if npols == 4.:
@@ -41,7 +76,8 @@ try:
 except:
 	bw = data_rate/pols/bits/2.
 # Set low end of the frequency in GHz
-freq0 = float(inputs['obs_freq'])-(bw/2000.)
+
+freq0 = float(obs_freq-(bw/2000.)
 
 ## Get data formatting to control size
 nchan= int(adv_inputs['nchan'])
