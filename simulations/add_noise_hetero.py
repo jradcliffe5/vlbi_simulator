@@ -25,12 +25,11 @@ def match_to_antenna_nos(sefds,diams,msfile):
 	tb = casatools.table()
 	qa = casatools.quanta()
 	me = casatools.measures()
-	evn_SEFD_2 = {}
+	evn_SEFD = {}
 	evn_diams = {}
 	tb.open('%s/ANTENNA'%msfile)
 	x = tb.getcol('NAME')
 	tb.close()
-	print(evn_SEFD)
 	for i,j in enumerate(x):
 		if sefds[j] == -1:
 			print('Antenna %s not got an SEFD.. exiting'%j)
@@ -38,9 +37,9 @@ def match_to_antenna_nos(sefds,diams,msfile):
 		if diams[j] == -1:
 			print('Antenna %s not got an diameter.. exiting'%j)
 			sys.exit()
-		evn_SEFD_2[i] = sefds[j]
+		evn_SEFD[i] = sefds[j]
 		evn_diams[i] = diams[j]
-	return evn_SEFD_2, evn_diams
+	return evn_SEFD, evn_diams
 
 def P2R(radii, angles):
 	return radii * np.exp(1j*angles)
