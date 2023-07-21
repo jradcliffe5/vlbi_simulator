@@ -13,6 +13,7 @@ from astropy.wcs import WCS
 from astropy import units as u
 from skimage.transform import rotate, rescale
 from simulator_functions import *
+from simulator_functions import find_frequencies
 casa6=True
 
 from astropy.utils.exceptions import AstropyWarning
@@ -20,7 +21,7 @@ import warnings
 warnings.simplefilter('ignore', category=AstropyWarning)
 
 
-def match_to_antenna_nos(evn_SEFD,msfile):
+def match_to_antenna_nos(sefds,diams,msfile):
 	tb = casatools.table()
 	qa = casatools.quanta()
 	me = casatools.measures()
@@ -31,8 +32,14 @@ def match_to_antenna_nos(evn_SEFD,msfile):
 	tb.close()
 	print(evn_SEFD)
 	for i,j in enumerate(x):
-		evn_SEFD_2[i] = evn_SEFD[j][0]
-		evn_diams[i] = evn_SEFD[j][1]
+		if sefds[j] == -1:
+			print('Antenna %s not got an SEFD.. exiting'%j)
+			sys.exit()
+		if diams[j] == -1:
+			print('Antenna %s not got an diameter.. exiting'%j)
+			sys.exit()
+		evn_SEFD_2[i] = sefds[j]
+		evn_diams[i] = diams[j]
 	return evn_SEFD_2, evn_diams
 
 def P2R(radii, angles):
@@ -174,7 +181,6 @@ def make_baseline_dictionary(msfile):
 	tb.close()
 	return dict([((x, y), np.where((A0 == x) & (A1 == y))[0])
 				for x in ant_unique for y in ant_unique if y > x])
-
 
 def calc_hpbw(x,diam,freq):
 	x = (x/60.)*(np.pi/180.)
@@ -468,23 +474,16 @@ except:
 inputs = headless(sys.argv[i+1])
 adv_inputs = headless(sys.argv[i+2])
 
-obs_freq = float(inputs['obs_freq'])
-if (obs_freq > 1.0) & (obs_freq < 2.0):
-	band='L'
-elif (obs_freq > 2.0) & (obs_freq < 3.5):
-	band='S'
-elif (obs_freq > 3.5) & (obs_freq < 7.5):
-	band='C'
-elif (obs_freq > 7.5):
-	band='K'
-else:
-	print('Band not supported')
-	sys.exit()
+sefd_key, obs_freq = find_frequencies(inputs['obs_freq'])
 
 ## Load sefds and diameters
-f = open('%s/simulations/ant_info.json'%inputs['repo_path'],)
-evn_SEFD = json.load(f)
+f = open('%s/simulations/sefds.json'%inputs['repo_path'],)
+sefds = json.load(f)
 f.close()
+f = open('%s/simulations/pbs.json'%inputs['repo_path'],)
+diams = json.load(f)
+f.close()
+
 if sys.argv[i] == 'S':
 	ms = '%s/%s.ms'%(inputs['output_path'],inputs['prefix'])
 elif sys.argv[i].startswith('M'):
@@ -502,7 +501,7 @@ print('Write elevation dependent flags')
 write_flag(ms,0,check_elevation(ms,custom_xyz=True),make_baseline_dictionary(ms))
 
 print('Match antennae to sefds')
-sefd_ants, diams_ants = match_to_antenna_nos(evn_SEFD[band],ms)
+sefd_ants, diams_ants = match_to_antenna_nos(sefds[sefd_key],diams[sefd_key],ms)
 
 print('Add simple noise')
 add_noise(msfile=ms,datacolumn='CORRECTED_DATA',evn_SEFD=sefd_ants,adjust_time=adjust_time)

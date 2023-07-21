@@ -1,6 +1,44 @@
 import re, os, inspect, sys, glob
 import numpy as np
 
+def find_nearest(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return array[idx]
+
+def find_frequencies(obs_freq):
+	freq_c = {"92cm":0.325861,
+	   "49cm":0.611821,
+	   "UHF":1.0,
+	   "21cm":1.427583,
+	   "18cm":1.665513,
+	   "13cm":2.306096,
+	   "6cm":4.996541,
+	   "5cm":5.99584916,
+	   "4cm":7.49481145,
+	   "2cm":14.9896229,
+	   "13mm":23.060958,
+	   "9mm":33.310273,
+	   "7mm":42.827494,
+	   "3mm":99.930819,
+	   "2mm":149.896229}
+	try:
+		obs_freq=float(obs_freq) ## try to see if obs frequency is a float
+		key_list = list(freq_c.keys())
+		val_list = list(freq_c.values())
+		val = find_nearest(val_list,obs_freq)
+		position = val_list.index(val)
+		sefd_key=key_list[position]
+	except:
+		try:
+			sefd_key = obs_freq
+			obs_freq=freq_c[obs_freq]
+		except:
+			print('Observing frequency incorrect')
+			sys.exit()
+	return sefd_key, obs_freq
+
+
 def headless(inputfile):
 	''' Parse the list of inputs given in the specified file. (Modified from evn_funcs.py)'''
 	INPUTFILE = open(inputfile, "r")
