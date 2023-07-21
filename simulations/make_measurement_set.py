@@ -77,7 +77,7 @@ except:
 	bw = data_rate/pols/bits/2.
 # Set low end of the frequency in GHz
 
-freq0 = float(obs_freq-(bw/2000.)
+freq0 = obs_freq-(bw/2000.)
 
 ## Get data formatting to control size
 nchan= int(adv_inputs['nchan'])
