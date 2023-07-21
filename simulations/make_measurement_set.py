@@ -27,8 +27,11 @@ def find_frequencies(obs_freq):
 	   "2mm":149.896229}
 	try:
 		obs_freq=float(obs_freq) ## try to see if obs frequency is a float
-		val = find_nearest(freq_c.values(),obs_freq)
-		sefd_key=freq_c.values().index(val)
+		key_list = list(freq_c.keys())
+		val_list = list(freq_c.values())
+		val = find_nearest(val_list,obs_freq)
+		position = val_list.index(val)
+		sefd_key=key_list[position]
 	except:
 		try:
 			sefd_key = obs_freq
