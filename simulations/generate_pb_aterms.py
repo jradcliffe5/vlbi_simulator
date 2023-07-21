@@ -19,6 +19,7 @@ try:
 	import warnings
 	from scipy import constants as c
 	warnings.simplefilter('ignore', category=AstropyWarning)
+	from simulator_functions import find_frequencies
 	casa6=True
 except:
 	# CASA 5
@@ -80,16 +81,25 @@ def parallacticAngle(msfile,times):
 			parallactic_ant_matrix[i] = antenna_para(i)*(180./np.pi)
 	return parallactic_ant_matrix
 
-def match_to_antenna_nos(evn_SEFD,msfile):
-	evn_SEFD_2 = {}
+def match_to_antenna_nos(sefds,diams,msfile):
+	tb = casatools.table()
+	qa = casatools.quanta()
+	me = casatools.measures()
+	evn_SEFD = {}
 	evn_diams = {}
 	tb.open('%s/ANTENNA'%msfile)
 	x = tb.getcol('NAME')
 	tb.close()
 	for i,j in enumerate(x):
-		evn_SEFD_2[i] = evn_SEFD[j][0]
-		evn_diams[i] = evn_SEFD[j][1]
-	return evn_SEFD_2, evn_diams
+		if sefds[j] == -1:
+			print('Antenna %s not got an SEFD.. exiting'%j)
+			sys.exit()
+		if diams[j] == -1:
+			print('Antenna %s not got an diameter.. exiting'%j)
+			sys.exit()
+		evn_SEFD[i] = sefds[j]
+		evn_diams[i] = diams[j]
+	return evn_SEFD, evn_diams
 
 def calc_hpbw(x,diam,freq):
 	x = (x/60.)*(np.pi/180.)
@@ -206,18 +216,7 @@ else:
 	print('Incorrect input')
 	sys.exit()
 
-obs_freq = float(inputs['obs_freq'])
-if (obs_freq > 1.0) & (obs_freq < 2.0):
-	band='L'
-elif (obs_freq > 2.0) & (obs_freq < 3.5):
-	band='S'
-elif (obs_freq > 3.5) & (obs_freq < 7.5):
-	band='C'
-elif (obs_freq > 7.5):
-	band='K'
-else:
-	print('band not supported')
-	sys.exit()
+sefd_key, obs_freq = find_frequencies(inputs['obs_freq'])
 
 tb = casatools.table()
 qa = casatools.quanta()
@@ -258,11 +257,14 @@ except:
 	diffcorr = True
 
 ## Load sefds and diameters
-f = open('%s/simulations/ant_info.json'%inputs['repo_path'],)
-evn_SEFD = json.load(f)
+f = open('%s/simulations/sefds.json'%inputs['repo_path'],)
+sefds = json.load(f)
+f.close()
+f = open('%s/simulations/pbs.json'%inputs['repo_path'],)
+diams = json.load(f)
 f.close()
 
-evn_sefd, evn_diams = match_to_antenna_nos(evn_SEFD[band],ms)
+evn_sefd, evn_diams = match_to_antenna_nos(sefds[sefd_key],diams[sefd_key],ms)
 nants = len(evn_diams.values())
 
 rmdirs(['%s.mask'%ms])
