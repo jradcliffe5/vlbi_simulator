@@ -40,7 +40,7 @@ npols        = 4                         # Number of polarisations
 obs_freq     = 1.4                       # Central observing frequency (in GHz)
 input_model  =                           # Give fits or CASA model for input to data (should set wide_field_ITRF=False)
 wf_ITRF      = True                      # Use compact array configuration to reduce image size needed
-
+use_complex  = True                      # Use complex formalism for noise
 
 ###-----------------------------###
 ###      Observing scheme       ###
