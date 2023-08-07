@@ -76,7 +76,7 @@ if part == 2:
 	commands.append('%s %s/simulations/generate_pb_aterms.py 0 0 0 S %s %s' %(inputs['CASA_exec'], rpath, sys.argv[i], sys.argv[i+1]))
 
 	## Wsclean primary beam
-	commands.append('%s -name %s/%s -no-update-model-required --aterm-kernel-size 157 -weight %s -scale %s -niter 1 -mgain 0.9 -auto-threshold 0.5 -auto-mask 4 -use-idg -idg-mode hybrid -aterm-config %s_single_pointing.ms_aterm_norotate_config.txt -size %d %d %s/%s_single_pointing.ms'%(inputs['wsclean_exec'],inputs['output_path'],inputs['prefix'],inputs['weight'],inputs['cell'],inputs['prefix'],int(inputs['size']),int(inputs['size']),inputs['output_path'],inputs['prefix']))
+	commands.append('%s -name %s/%s -no-update-model-required --aterm-kernel-size 157 -weight %s -scale %s -niter 1 -mgain 0.9 -auto-threshold 0.5 -auto-mask 4 -use-idg -idg-mode hybrid -aterm-config %s.ms_aterm_norotate_config.txt -size %d %d %s/%s.ms'%(inputs['wsclean_exec'],inputs['output_path'],inputs['prefix'],inputs['weight'],inputs['cell'],inputs['prefix'],int(inputs['size']),int(inputs['size']),inputs['output_path'],inputs['prefix']))
 
 	if inputs['mosaic'] == "False":
 		commands.append('%s %s/%s-image-pb.fits'%(inputs['rms_exec'],inputs['output_path'],inputs['prefix']))
