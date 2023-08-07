@@ -121,6 +121,6 @@ if part == 3:
 		commands.append('%s %s/simulations/make_mosaic.py %s'%(inputs['CASA_exec'],rpath,sys.argv[i]))
 
 		## Make rms map
-		commands.append('%s %s/%s_mosaic.linmos.fits'%(inputs['rms_exec'],inputs['output_path'],inputs['prefix']))
+		#commands.append('%s %s/%s_mosaic.linmos.fits'%(inputs['rms_exec'],inputs['output_path'],inputs['prefix']))
 
 		write_job(step=step,commands=commands,job_manager=inputs['job_manager'])
