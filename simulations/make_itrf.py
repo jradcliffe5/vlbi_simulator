@@ -1,12 +1,46 @@
 import pandas as pd
-import sys, os
+import sys, json
 from simulator_functions import rmfiles, headless
 print('Making configuration files')
 inputs=headless(sys.argv[1])
 ### Antennae used are given in the arguments
 antennae = sys.argv[2:]
 
+f = open('%s/simulations/sefds.json'%inputs['repo_path'],)
+sefds = json.load(f)
+f.close()
+f = open('%s/simulations/pbs.json'%inputs['repo_path'],)
+diams = json.load(f)
+f.close()
+
+print('Checking antennae for SEFD and diameter compatibility')
+ns = []
+ni = []
+nd = []
+for i in antennae:
+	try:
+		if sefds[i] == -1:
+			ns.append(i)
+	except:
+		ni.append(i)
+	try:
+		if diams[i] == -1:
+			nd.append(i)
+	except:
+		pass
+if ((ns!=[])&(nd!=[])&(ni!=[])):
+	if ns!=[]:
+		print('The following antennae have no SEFD information: %s'% ns)
+	if nd!=[]:
+		print('The following antennae have no primary beam information: %s'% nd)
+	if ni!=[]:
+		print('The following antennae have no information at all: %s'% ni)
+	print('Please modify the pbs.json and sefds.json or remove the antenna')
+	sys.exit()
+
+
 print('Will make configuration file for the following telescopes %s'%antennae)
+
 
 rmfiles(['sims.itrf'])
 ## Load VLBI array coordinates

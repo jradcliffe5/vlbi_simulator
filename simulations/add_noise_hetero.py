@@ -479,11 +479,8 @@ adv_inputs = headless(sys.argv[i+2])
 
 sefd_key, obs_freq = find_frequencies(inputs['obs_freq'])
 
-if inputs['use_complex'] == 'True':
-	use_complex = True
-else:
-	use_complex = False
-print(use_complex)
+use_complex = True ## Always adopt this as it is correct
+
 ## Load sefds and diameters
 f = open('%s/simulations/sefds.json'%inputs['repo_path'],)
 sefds = json.load(f)
