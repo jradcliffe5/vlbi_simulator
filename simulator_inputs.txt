@@ -9,7 +9,7 @@ CASA_exec    = singularity exec /idia/software/containers/casa-6.3.simg python
 wsclean_exec = singularity exec /idia/software/containers/wsclean-gpu.simg wsclean
 stimela_exec = /scratch3/users/jradcliffe5/STIMELA_SINGULARITY_IMAGES/stimela_simms_1.2.0.img python
 output_path  = ./
-repo_path = /test/
+repo_path = /users/jradcliffe5/scratch3/SKA_VLBI/v2/vlbi_simulator
 prefix = test
 
 ###-------------------###
@@ -18,7 +18,7 @@ prefix = test
 
 job_manager       =  slurm
 HPC_project_code  =  
-partition         =  GPUV100
+partition         =  Main
 walltime          =  10:00:00
 nodes             =     1
 cpus              =    24
@@ -32,12 +32,12 @@ email_progress    =  jack.f.radcliffe@gmail.com
 ### Array and data set-up ###
 ###-----------------------###
 
-antennae     = ["Sc", "Hn", "Nl", "Fd"]  # List of antennae (uses same codenames as the EVN calculator)
-data_rate    = 512                       # Data-rate in Mbit/s
+antennae     = ["Mc","On","Tr","W1","Nt","Sh","Ur","Hh","Sv","Zc","Bd","Ir","Jb2"]  # List of antennae (uses same codenames as the EVN calculator)
+data_rate    = 1024                       # Data-rate in Mbit/s
 bit_sampling = 2                         # Bit sampling 
 bandwidth    =                           # Bandwidth in MHz (if set, it will override data_rate)
 npols        = 4                         # Number of polarisations
-obs_freq     = 1.4                       # Central observing frequency (in GHz)
+obs_freq     = 1.6                       # Central observing frequency (in GHz)
 input_model  =                           # Give fits or CASA model for input to data (should set wide_field_ITRF=False)
 wf_ITRF      = True                      # Use compact array configuration to reduce image size needed
 
@@ -45,7 +45,7 @@ wf_ITRF      = True                      # Use compact array configuration to re
 ###      Observing scheme       ###
 ###-----------------------------###
 field_centre          = ["12h02m21.6s", "70d11m56.5s"] # Field centre (pointing centre if mosaic=False otherwise mosaic centre)
-total_time_on_source  = 0.9333                         # Total time on the target source in hours
+total_time_on_source  = 12                         # Total time on the target source in hours
 time_multiplier       = 1                              # Do ad-hoc multiplication to adjust SEFD to sim time w/o large data
 mosaic                = True                           # Make a mosaic
 mosaic_area           = [2,2]                          # Mosaic area in degrees    

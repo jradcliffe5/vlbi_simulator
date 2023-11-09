@@ -1,6 +1,7 @@
 import pandas as pd
 import sys, json
-from simulator_functions import rmfiles, headless
+from simulator_functions import rmfiles, headless, find_frequencies
+
 print('Making configuration files')
 inputs=headless(sys.argv[1])
 ### Antennae used are given in the arguments
@@ -13,22 +14,29 @@ f = open('%s/simulations/pbs.json'%inputs['repo_path'],)
 diams = json.load(f)
 f.close()
 
+sefd_key, obs_freq = find_frequencies(inputs['obs_freq'])
+
 print('Checking antennae for SEFD and diameter compatibility')
 ns = []
 ni = []
 nd = []
 for i in antennae:
 	try:
-		if sefds[i] == -1:
+		if sefds[sefd_key][i] == -1:
 			ns.append(i)
+		else:
+			pass
 	except:
 		ni.append(i)
 	try:
-		if diams[i] == -1:
+		if diams[sefd_key][i] == -1:
 			nd.append(i)
+		else:
+			pass
 	except:
 		pass
-if ((ns!=[])&(nd!=[])&(ni!=[])):
+
+if ((ns!=[])|(nd!=[])|(ni!=[])):
 	if ns!=[]:
 		print('The following antennae have no SEFD information: %s'% ns)
 	if nd!=[]:
