@@ -119,6 +119,7 @@ def write_hpc_headers(step,params):
 					 'nodetype'      :'',
 					 'cpus'          :'', 
 					 'nodes'         :'',
+					 'mem'           :'',
 					 'mpiprocs'      :'', 
 					 'walltime'      :'',
 					 'job_name'      :'',
