@@ -55,6 +55,7 @@ custom_mosaic         =                                # Give custom positions (
 ###-----------------###
 ###     Imaging     ###
 ###-----------------###
+run = False
 size   = 5000
 cell   = 1.5arcsec
 weight = natural
