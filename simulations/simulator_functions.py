@@ -1,5 +1,6 @@
 import re, os, inspect, sys, glob
 import numpy as np
+import logging
 
 def find_nearest(array, value):
     array = np.asarray(array)
@@ -34,7 +35,7 @@ def find_frequencies(obs_freq):
 			sefd_key = obs_freq
 			obs_freq=freq_c[obs_freq]
 		except:
-			print('Observing frequency incorrect')
+			logging.error('Observing frequency incorrect')
 			sys.exit()
 	return sefd_key, obs_freq
 
@@ -71,7 +72,6 @@ def headless(inputfile):
 
 def write_hpc_headers(step,params):
 	func_name = inspect.stack()[0][3]
-	print(params)
 	hpc_opts = {}
 	hpc_opts['job_manager'] = params['job_manager']
 	hpc_opts['job_name'] = 'vlbisim_%s'%step
@@ -99,7 +99,7 @@ def write_hpc_headers(step,params):
 					 'job_name'      :'#SBATCH -J %s'%hpc_opts['job_name'],
 					 'hpc_account'   :'#SBATCH --account %s'%hpc_opts['hpc_account'],
 					 'email_progress':'#SBATCH --mail-type=BEGIN,END,FAIL\n#SBATCH --mail-user=%s'%hpc_opts['email_progress'],
-					 'error':'#SBATCH -o %s%s.sh.stdout.log\n#SBATCH -e %s%s.sh.stderr.log'%(params['output_path'],hpc_opts['error'],params['output_path'],hpc_opts['error'])
+					 'error':'#SBATCH -o %slogs/%s.sh.stdout.log\n#SBATCH -e %slogs/%s.sh.stderr.log'%(params['output_path'],hpc_opts['error'],params['output_path'],hpc_opts['error'])
 					},
 				'pbs':{
 					 'partition'     :'#PBS -q %s'%hpc_opts['partition'],
@@ -112,7 +112,7 @@ def write_hpc_headers(step,params):
 					 'job_name'      :'#PBS -N %s'%hpc_opts['job_name'],
 					 'hpc_account'   :'#PBS -P %s'%hpc_opts['hpc_account'],
 					 'email_progress':'#PBS -m abe -M %s'%hpc_opts['email_progress'],
-					 'error':'#PBS -o %s%s.sh.stdout.log\n#PBS -e %s%s.sh.stderr.log'%(params['output_path'],hpc_opts['error'],params['output_path'],hpc_opts['error'])
+					 'error':'#PBS -o %slogs/%s.sh.stdout.log\n#PBS -e %slogs/%s.sh.stderr.log'%(params['output_path'],hpc_opts['error'],params['output_path'],hpc_opts['error'])
 					},
 				'bash':{
 					 'partition'     :'',
@@ -170,18 +170,18 @@ def rmfiles(files):
 	for i in files:
 		if "*" in i:
 			files_to_die = glob.glob(i)
-			print('Files matching with %s - deleting'% i)
+			logging.info('Files matching with %s - deleting'% i)
 			for j in files_to_die:
 				if os.path.exists(j) == True:
-					print('File %s found - deleting'% j)
+					logging.info('File %s found - deleting'% j)
 					os.system('rm %s'%j)
 				else:
 					pass
 		elif os.path.exists(i) == True:
-			print('File %s found - deleting'% i)
+			logging.info('File %s found - deleting'% i)
 			os.system('rm %s'%i)
 		else:
-			print('No file found - %s'% i)
+			logging.info('No file found - %s'% i)
 	return
 
 def rmdirs(dirs):
@@ -189,16 +189,16 @@ def rmdirs(dirs):
 	for i in dirs:
 		if "*" in i:
 			files_to_die = glob.glob(i)
-			print('Directories matching with %s - deleting'% i)
+			logging.info('Directories matching with %s - deleting'% i)
 			for j in files_to_die:
 				if os.path.exists(j) == True:
-					print('Directory/table %s found - deleting'% j)
+					logging.info('Directory/table %s found - deleting'% j)
 					os.system('rm -r %s'%j)
 				else:
 					pass
 		elif os.path.exists(i) == True:
-			print('Directory/table %s found - deleting'% i)
+			logging.info('Directory/table %s found - deleting'% i)
 			os.system('rm -r %s'%i)
 		else:
-			print('No file found - %s'% i)
+			logging.info('No file found - %s'% i)
 	return

@@ -7,7 +7,7 @@ f.close()
 f = open('pbs.json',)
 diams = json.load(f)
 f.close()
-df = pd.read_csv('master.itrf',delimiter=" ", header=None,names=['X', 'Y', 'Z', 'dish_diam', 'station', 'mount'],index_col=False)
+df = pd.read_csv('master.itrf',delimiter=" ", header=None,names=['X', 'Y', 'Z', 'dish_diam', 'station', 'mount'],index_col=False,dtype=str, keep_default_na=False)
 pd.set_option("display.precision",10)
 ant_names = list(sefds["18cm"].keys())
 freqs = list(sefds.keys())
@@ -20,9 +20,9 @@ for i,j in enumerate(ant_names):
 	master_json[j]['SEFD'] = {}
 	master_json[j]['diameter'] = {}
 	try:
-		master_json[j]['ITRF']['x'] = df['X'][np.where(df['station']==j)[0]].values[0]
-		master_json[j]['ITRF']['y'] = df['Y'][np.where(df['station']==j)[0]].values[0]
-		master_json[j]['ITRF']['z'] = df['Z'][np.where(df['station']==j)[0]].values[0]
+		master_json[j]['ITRF']['x'] = str(df['X'][np.where(df['station']==j)[0]].values[0])
+		master_json[j]['ITRF']['y'] = str(df['Y'][np.where(df['station']==j)[0]].values[0])
+		master_json[j]['ITRF']['z'] = str(df['Z'][np.where(df['station']==j)[0]].values[0])
 	except:
 		master_json[j]['ITRF']['x'] = -1
 		master_json[j]['ITRF']['y'] = -1

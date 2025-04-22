@@ -35,6 +35,17 @@ except:
 	# Python 3
 	from io import StringIO
 
+import logging
+
+logging.basicConfig(
+	level=logging.INFO,
+	format="%(asctime)s [%(levelname)s] %(message)s",
+	handlers=[
+		logging.FileHandler("logs/make_primary_beams.log"),
+		logging.StreamHandler()
+	]
+)
+
 def parallacticAngle(msfile,times):
 	tb = casatools.table()
 	qa = casatools.quanta()
@@ -81,7 +92,7 @@ def parallacticAngle(msfile,times):
 			parallactic_ant_matrix[i] = antenna_para(i)*(180./np.pi)
 	return parallactic_ant_matrix
 
-def match_to_antenna_nos(sefds,diams,msfile):
+def match_to_antenna_nos(ant_info,sefd_key,msfile):
 	tb = casatools.table()
 	qa = casatools.quanta()
 	me = casatools.measures()
@@ -91,14 +102,14 @@ def match_to_antenna_nos(sefds,diams,msfile):
 	x = tb.getcol('NAME')
 	tb.close()
 	for i,j in enumerate(x):
-		if sefds[j] == -1:
-			print('Antenna %s not got an SEFD.. exiting'%j)
+		if ant_info[j]['SEFD'][sefd_key] == -1:
+			logger.info('Antenna %s not got an SEFD.. exiting'%j)
 			sys.exit()
-		if diams[j] == -1:
-			print('Antenna %s not got an diameter.. exiting'%j)
+		if ant_info[j]['diameter'][sefd_key] == -1:
+			logger.info('Antenna %s not got an diameter.. exiting'%j)
 			sys.exit()
-		evn_SEFD[i] = sefds[j]
-		evn_diams[i] = diams[j]
+		evn_SEFD[i] = ant_info[j]['SEFD'][sefd_key]
+		evn_diams[i] = ant_info[j]['diameter'][sefd_key]
 	return evn_SEFD, evn_diams
 
 def calc_hpbw(x,diam,freq):
@@ -207,13 +218,12 @@ except:
 	pass
 
 inputs = headless(sys.argv[i+4])
-adv_inputs = headless(sys.argv[i+5])
 if sys.argv[i+3] == 'S':
 	ms = '%s/%s.ms'%(inputs['output_path'],inputs['prefix'])
 elif sys.argv[i+3].startswith('M'):
 	ms = '%s/%s_mosaic_%s.ms'%(inputs['output_path'],inputs['prefix'],sys.argv[i+3].split('M')[1])
 else:
-	print('Incorrect input')
+	logger.error('Incorrect input')
 	sys.exit()
 
 sefd_key, obs_freq = find_frequencies(inputs['obs_freq'])
@@ -257,14 +267,11 @@ except:
 	diffcorr = True
 
 ## Load sefds and diameters
-f = open('%s/simulations/sefds.json'%inputs['repo_path'],)
-sefds = json.load(f)
-f.close()
-f = open('%s/simulations/pbs.json'%inputs['repo_path'],)
-diams = json.load(f)
+f = open('%s/simulations/ant_info.json'%inputs['repo_path'],)
+ant_info = json.load(f)
 f.close()
 
-evn_sefd, evn_diams = match_to_antenna_nos(sefds[sefd_key],diams[sefd_key],ms)
+evn_sefd, evn_diams = match_to_antenna_nos(ant_info,sefd_key,ms)
 nants = len(evn_diams.values())
 
 rmdirs(['%s.mask'%ms])

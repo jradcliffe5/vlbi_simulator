@@ -14,14 +14,26 @@ from astropy import units as u
 from skimage.transform import rotate, rescale
 from simulator_functions import *
 from simulator_functions import find_frequencies
+from scipy.constants import c as speed_light
 casa6=True
 
 from astropy.utils.exceptions import AstropyWarning
 import warnings
 warnings.simplefilter('ignore', category=AstropyWarning)
 
+import logging
 
-def match_to_antenna_nos(sefds,diams,msfile):
+logging.basicConfig(
+	level=logging.INFO,
+	format="%(asctime)s [%(levelname)s] %(message)s",
+	handlers=[
+		logging.FileHandler("logs/add_noise.log"),
+		logging.StreamHandler()
+	]
+)
+
+
+def match_to_antenna_nos(ant_info,sefd_key,msfile):
 	tb = casatools.table()
 	qa = casatools.quanta()
 	me = casatools.measures()
@@ -31,14 +43,14 @@ def match_to_antenna_nos(sefds,diams,msfile):
 	x = tb.getcol('NAME')
 	tb.close()
 	for i,j in enumerate(x):
-		if sefds[j] == -1:
-			print('Antenna %s not got an SEFD.. exiting'%j)
+		if ant_info[j]['SEFD'][sefd_key] == -1:
+			logger.info('Antenna %s not got an SEFD.. exiting'%j)
 			sys.exit()
-		if diams[j] == -1:
-			print('Antenna %s not got an diameter.. exiting'%j)
+		if ant_info[j]['diameter'][sefd_key] == -1:
+			logger.info('Antenna %s not got an diameter.. exiting'%j)
 			sys.exit()
-		evn_SEFD[i] = sefds[j]
-		evn_diams[i] = diams[j]
+		evn_SEFD[i] = ant_info[j]['SEFD'][sefd_key]
+		evn_diams[i] = ant_info[j]['diameter'][sefd_key]
 	return evn_SEFD, evn_diams
 
 def P2R(radii, angles):
@@ -475,18 +487,14 @@ except:
 	pass
 
 inputs = headless(sys.argv[i+1])
-adv_inputs = headless(sys.argv[i+2])
 
 sefd_key, obs_freq = find_frequencies(inputs['obs_freq'])
 
 use_complex = True ## Always adopt this as it is correct
 
 ## Load sefds and diameters
-f = open('%s/simulations/sefds.json'%inputs['repo_path'],)
-sefds = json.load(f)
-f.close()
-f = open('%s/simulations/pbs.json'%inputs['repo_path'],)
-diams = json.load(f)
+f = open('%s/simulations/ant_info.json'%inputs['repo_path'],)
+ant_info = json.load(f)
 f.close()
 
 if sys.argv[i] == 'S':
@@ -494,37 +502,50 @@ if sys.argv[i] == 'S':
 elif sys.argv[i].startswith('M'):
 	ms = '%s/%s_mosaic_%s.ms'%(inputs['output_path'],inputs['prefix'],sys.argv[i].split('M')[1])
 else:
-	print('Incorrect input')
+	logging.error('Incorrect input')
 	sys.exit()
 
 adjust_time = float(inputs['time_multiplier'])
 
-print('Clearing calibration')
+logging.info('Clearing calibration')
 clearcal(vis=ms)
 
-print('Write elevation dependent flags')
+logging.info('Write elevation dependent flags')
 write_flag(ms,0,check_elevation(ms,custom_xyz=True),make_baseline_dictionary(ms))
 
-print('Match antennae to sefds')
-sefd_ants, diams_ants = match_to_antenna_nos(sefds[sefd_key],diams[sefd_key],ms)
+logging.info('Match antennae to sefds')
+sefd_ants, diams_ants = match_to_antenna_nos(ant_info,sefd_key,ms)
 
-print('Add simple noise')
+logging.info('Add simple noise')
 add_noise(msfile=ms,datacolumn='CORRECTED_DATA',evn_SEFD=sefd_ants,adjust_time=adjust_time,complex_noise=use_complex)
 
-print('Making image')
-rmdirs(glob.glob('%s_IM.*'%ms.split('.ms')[0]))
 
-imsize = int(inputs['size'])
-cell = str(inputs['cell'])
 
-if inputs['run'] == 'True':
-	tclean(vis=ms,
-		imagename='%s_IM'%ms.split('.ms')[0],
-		cell=cell,
-		imsize=[imsize,imsize],
-		deconvolver='clarkstokes',
-		niter=int(1e5),
-		nsigma=1.2,
-		usemask='user',
-		pblimit=1e-10,
-		mask='circle[[%dpix, %dpix], 5pix]'%(imsize/2.,imsize/2.))
+if inputs['mode']=='ms_image':
+	logging.info('Making image')
+	rmdirs(glob.glob('%s_IM.*'%ms.split('.ms')[0]))
+
+	imsize = int(inputs['size'])
+	cell = str(inputs['cell'])
+	if cell == 'auto':
+		tb = casatools.table()
+		tb.open('%s/SPECTRAL_WINDOW'%ms)
+		bw = np.sum(tb.getcol('TOTAL_BANDWIDTH'))
+		high_freq = tb.getcol('CHAN_FREQ')[0][0]+bw
+		tb.close()
+		mst = casatools.ms()
+		mst.open(ms)
+		max_uv = mst.getdata('uvdist')['uvdist'].max()
+		mst.close()
+		cell = "%.4fmas"%(((speed_light/high_freq)/max_uv)*(180./np.pi)*(3.6e6/5.))
+
+
+		tclean(vis=ms,
+			imagename='%s_IM'%ms.split('.ms')[0],
+			cell=cell,
+			imsize=[imsize,imsize],
+			deconvolver='clarkstokes',
+			niter=10000,
+			nsigma=3,
+			usemask='user',
+			pblimit=1e-10)

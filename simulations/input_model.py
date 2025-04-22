@@ -4,6 +4,17 @@ import sys, os
 
 from simulator_functions import headless
 
+import logging
+
+logging.basicConfig(
+	level=logging.INFO,
+	format="%(asctime)s [%(levelname)s] %(message)s",
+	handlers=[
+		logging.FileHandler("logs/import_model.log"),
+		logging.StreamHandler()
+	]
+)
+
 ## Imports input_file
 try:
 	i = sys.argv.index("-c") + 2
@@ -22,5 +33,5 @@ elif part == 2:
     os.system('rm -r %s.ms'%(inputs['prefix']))
     os.system('mv %s.ms2 %s.ms'%(inputs['prefix'],inputs['prefix']))
 else:
-	print('rubbish')
+	logger.error('This did not work, please check the errors in CASA to diagnose')
 	sys.exit()

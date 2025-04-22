@@ -5,6 +5,17 @@ from datetime import datetime, timedelta
 from simulator_functions import headless, rmdirs, find_frequencies
 import sys
 
+import logging
+
+logging.basicConfig(
+	level=logging.INFO,
+	format="%(asctime)s [%(levelname)s] %(message)s",
+	handlers=[
+		logging.FileHandler("logs/simulate_ms.log"),
+		logging.StreamHandler()
+	]
+)
+
 try:
 	i = sys.argv.index("-c") + 2
 except:
@@ -13,12 +24,11 @@ except:
 
 ## Import inputs
 inputs = headless(sys.argv[i+1])
-adv_inputs = headless(sys.argv[i+2])
 output = str(inputs['output_path'])
 try:
 	prefix = str(inputs['prefix'])
 except:
-	print('Inputs not set, will default to sim')
+	logging.warning('Inputs not set, will default to sim')
 	prefix='sim'
 
 ## Calculate bandwidths from datarates or directly
@@ -47,17 +57,17 @@ except:
 freq0 = obs_freq-(bw/2000.)
 
 ## Get data formatting to control size
-nchan= int(adv_inputs['nchan'])
-int_time = np.round(float(adv_inputs['int_time']),5)
+nchan= int(inputs['nchan'])
+int_time = np.round(float(inputs['int_time']),5)
 
 ## Set up time on source, 12 hours used for mosaic simulations so an accurate primary beam can be inferred.
-if inputs['mosaic'] == "True":
+if inputs['mode'] == 'rms_map_mosaic':
 	tos = 12
 else:
 	tos = float(inputs['total_time_on_source'])
 
 ## If making very wide-field images, we simply use vla-c array positions so we don't need to make massive images.
-if str(inputs['wf_ITRF']) == 'True':
+if (inputs['mode'] == "rms_maps") == True:
 	itrf="%s/vlapos_sims.itrf"%output
 else:
 	itrf="%s/sims.itrf"%output
@@ -75,9 +85,9 @@ if sys.argv[i] == 'S':
 	tos = np.round(tos,5)
 
 	# Simms command
-	print('Making single pointing ms - %s.ms with the following parameters'%prefix)
-	print('Total time on source: %.2f hr, integration time = %.2f s'%(tos,int_time))
-	print('Bandwidth: %.6f MHz, number channels: %d'%(bw,nchan))
+	logging.info('Making single pointing ms - %s.ms with the following parameters'%prefix)
+	logging.info('Total time on source: %.2f hr, integration time = %.2f s'%(tos,int_time))
+	logging.info('Bandwidth: %.6f MHz, number channels: %d'%(bw,nchan))
 	simms.create_empty_ms(
 	msname=MS,
 	label=None,
@@ -120,13 +130,13 @@ elif sys.argv[1] == 'M':
 			direction.append([line[2],line[4]])
 	tos = float(inputs['total_time_on_source'])
 	total_time = tos
-	print(total_time, total_time/float(len(direction)) , len(direction))
+	logging.info(total_time, total_time/float(len(direction)) , len(direction))
 	synthesis = np.round(total_time/float(len(direction)),5)
 	for i in range(len(direction)):
-		print('Making %s_mosaic_%s.ms with direction ra=%s, dec=%s'%(prefix,i,direction[i][0],direction[i][1]))
+		logging.info('Making %s_mosaic_%s.ms with direction ra=%s, dec=%s'%(prefix,i,direction[i][0],direction[i][1]))
 		rmdirs(['%s/%s_mosaic_%s.ms'%(output, prefix, i)])
 		MS='%s/%s_mosaic_%s.ms'%(output, prefix, i)
-		dt = datetime.strptime(adv_inputs['time_start'], '%d %b %Y') #+ timedelta(hours=2/60+(0*total_time/float(len(direction))))
+		dt = datetime.strptime(inputs['time_start'], '%d %b %Y') #+ timedelta(hours=2/60+(0*total_time/float(len(direction))))
 		simms.create_empty_ms(
 		msname=MS,
 		label=None,
@@ -160,5 +170,5 @@ elif sys.argv[1] == 'M':
 		optimise_start=None
 		)
 else:
-	print('Something has gone wrong')
+	logging.error('Something has gone wrong')
 	sys.exit()
