@@ -1,8 +1,0 @@
-## Some more advanced inputs for the simulator. Normally ok to keep these as is.
-
-###--------------------------------###
-### Array and data set-up advanced ###
-###--------------------------------###
-nchan    = 64  # Number of channels in whole bandwidth
-int_time = 30  # Integration time 
-time_start = '21 Sep 2022' #Start time
