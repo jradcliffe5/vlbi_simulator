@@ -46,7 +46,9 @@ print('Making linear mosaic')
 if inputs['clean_rms'] == 'True':
 	for i in range(len(cims)):
 		lm.makemosaic(images=cims[i], weightimages=pbs[i],weighttype=1,imageweighttype=0)
-		exportfits(imagename='%s/%s_mosaic.linmos'%(inputs['output_path'],inputs['prefix']),fitsimage='%s/%s_mosaic.linmos.fits'%(inputs['output_path'],inputs['prefix']),overwrite=True)
+		exportfits(imagename='%s/%s_mosaic.linmos'%(inputs['output_path'],inputs['prefix']),
+		           fitsimage='%s/%s_mosaic.linmos.fits'%(inputs['output_path'],inputs['prefix']),
+				   overwrite=True)
 		rms = imstat(imagename=cims[i])['rms'].squeeze()
 		os.system('rm -r %s.smooth'%cims[i])
 		immath(imagename=pbs[i],outfile=cims[i]+'.smooth',expr='%.9f/IM0'%rms)

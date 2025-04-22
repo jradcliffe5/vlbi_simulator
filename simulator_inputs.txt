@@ -3,13 +3,13 @@
 ###--------------------###
 ### Software and paths ###
 ###--------------------###
-# Executable locations (you need stimela, CASA 6+, wsclean with the IDG libraries installed, & BANE)
+# Executable locations (you need stimela, CASA 6+, wsclean with the IDG libraries installed)
 
 CASA_exec    = singularity exec /idia/software/containers/casa-6.3.simg python
-wsclean_exec = singularity exec /idia/software/containers/wsclean-gpu.simg wsclean
-stimela_exec = /scratch3/users/jradcliffe5/STIMELA_SINGULARITY_IMAGES/stimela_simms_1.2.0.img python
+wsclean_exec = singularity exec /idia/software/containers/wsclean-v3.0-idg.simg wsclean
+stimela_exec = singularity exec /scratch3/users/jradcliffe5/STIMELA_SINGULARITY_IMAGES/stimela_simms_1.2.0.img python
 output_path  = ./
-repo_path = /users/jradcliffe5/scratch3/SKA_VLBI/v2/vlbi_simulator
+repo_path = /users/jradcliffe5/scratch3/sim_debugging/vlbi_simulator
 prefix = test
 
 ###-------------------###
@@ -18,7 +18,7 @@ prefix = test
 
 job_manager       =  slurm
 HPC_project_code  =  
-partition         =  Main
+partition         =  GPU
 walltime          =  10:00:00
 nodes             =     1
 cpus              =    24
@@ -28,35 +28,40 @@ max_jobs          =    -1
 mem               = 50G
 email_progress    =  jack.f.radcliffe@gmail.com
 
-###-----------------------###
-### Array and data set-up ###
-###-----------------------###
+###-------------------###
+###  Simulation mode  ###
+###-------------------###
+mode = ms_image             # options ms_only | ms_image | rms_map | rms_map_mosaic
 
-antennae     = ["Mc","On","Tr","W1","Nt","Sh","Ur","Hh","Sv","Zc","Bd","Ir","Jb2"]  # List of antennae (uses same codenames as the EVN calculator)
-data_rate    = 1024                       # Data-rate in Mbit/s
-bit_sampling = 2                         # Bit sampling 
-bandwidth    =                           # Bandwidth in MHz (if set, it will override data_rate)
-npols        = 4                         # Number of polarisations
-obs_freq     = 1.6                       # Central observing frequency (in GHz)
-input_model  =                           # Give fits or CASA model for input to data (should set wide_field_ITRF=False)
-wf_ITRF      = True                      # Use compact array configuration to reduce image size needed
+###------------------------------###
+### Array & observing parameters ###
+###------------------------------###
 
-###-----------------------------###
-###      Observing scheme       ###
-###-----------------------------###
-field_centre          = ["12h02m21.6s", "70d11m56.5s"] # Field centre (pointing centre if mosaic=False otherwise mosaic centre)
-total_time_on_source  = 12                         # Total time on the target source in hours
-time_multiplier       = 1                              # Do ad-hoc multiplication to adjust SEFD to sim time w/o large data
-mosaic                = True                           # Make a mosaic
-mosaic_area           = [2,2]                          # Mosaic area in degrees    
+antennas     = ["Mc","On","Tr","W1","Nt","Sh","Ur","Sv","Zc","Bd","Jb2"]  # List of antennas (uses same codenames as the EVN calculator)
+data_rate    = 1024                                    # Data-rate in Mbit/s
+bit_sampling = 2                                       # Bit sampling 
+bandwidth    =                                         # Bandwidth in MHz (if set, it will override data_rate)
+npols        = 4                                       # Number of polarisations
+obs_freq     = 1.6                                     # Central observing frequency (in GHz)
+nchan        = 64                                      # Number of channels in whole bandwidth
+int_time     = 30                                      # Integration time in seconds
+time_start = '21 Sep 2022'                             # Start time
+input_model  =                                         # Give fits or CASA model for input to data (should set wide_field_ITRF=False)
+field_centre          = ["19h20m30.4s", "21d49m06.0s"] # Field centre (pointing centre if mosaic=False otherwise mosaic centre)
+total_time_on_source  = 12                             # Total time on the target source in hours
+time_multiplier       = 1                              # Do ad-hoc multiplication to adjust SEFD to sim time w/o large data sizes
+
+###-----------------------###
+### Parameters for mosaic ###
+###-----------------------###
+mosaic_area           = [2,2]                          # Mosaic area in degrees (centred on field_centre)  
 mosaic_filling_factor = 1.2                            # Filling factor for mosaic (increase if want non-uniform sensitivity)
 custom_mosaic         =                                # Give custom positions (will override area if set)
 
-###-----------------###
-###     Imaging     ###
-###-----------------###
-run = False
+###----------------------###
+###  Imaging parameters  ###
+###----------------------###
 size   = 5000
-cell   = 1.5arcsec
+cell   = auto
 weight = natural
-clean_rms = True
+#clean_rms = True
